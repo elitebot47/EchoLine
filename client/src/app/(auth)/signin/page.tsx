@@ -1,13 +1,13 @@
 "use client";
-import { signIn } from "@/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useSearchParams } from "next/navigation";
-import Router from "next/router";
+import { signIn } from "next-auth/react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
 export default function SignInPage() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/home";
 
@@ -15,21 +15,31 @@ export default function SignInPage() {
   const [password, setPassword] = useState("");
   const [loader, setLoader] = useState(false);
   async function HandleSubmit() {
+    setLoader(true);
     const response = await signIn("credentials", {
       redirect: false,
-      email: email.trim().toLowerCase(),
-      password: password.trim(),
       callbackUrl,
+      credentials: {
+        email: email.trim().toLowerCase(),
+        password: password.trim(),
+      },
     });
+
+    console.log("response", response);
 
     if (response?.error) {
       if (response.error === "CredentialsSignin") {
         toast.error("Invalid email or password");
+        setLoader(false);
+        return;
       }
     }
     if (response.ok) {
       toast.success("Login successful✅");
-      Router.replace(callbackUrl);
+      setLoader(false);
+      console.log(callbackUrl);
+
+      router.replace(callbackUrl);
     }
   }
   return (

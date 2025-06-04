@@ -3,6 +3,8 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
   const { email, password, name } = await req.json();
+  console.log(`${email}${password}${name}`);
+
   if (!email || !password || !name) {
     return NextResponse.json(
       {
@@ -13,7 +15,9 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const existingUser = await prisma.user.findUnique({ where: email });
+    const existingUser = await prisma.user.findUnique({ where: { email } });
+    console.log("existingUser", existingUser);
+
     if (existingUser)
       return NextResponse.json(
         { message: "User already exists!" },
@@ -27,6 +31,8 @@ export async function POST(req: NextRequest) {
         name,
       },
     });
+    console.log("User created in db");
+
     return NextResponse.json({ message: "Registration successfull✅" });
   } catch (error) {
     console.log(`error:${error}`);
