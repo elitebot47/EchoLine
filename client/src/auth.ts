@@ -8,25 +8,22 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       name: "Email and password",
       credentials: {
         email: {
-          label: "email",
-          type: "text",
+          label: "Email",
+          type: "email",
         },
         password: {
-          label: "password",
+          label: "Password",
           type: "password",
         },
       },
-      async authorize(
-        credentials: Partial<Record<"email" | "password", unknown>>
-      ) {
-        console.log(`${credentials.email} ${credentials.password}`);
+      async authorize(credentials) {
+        // if (!credentials.email || !credentials.password) {
+        //   return null;
+        // }
 
-        if (!credentials.email || !credentials.password) {
-          return null;
-        }
-        const email = String(credentials.email).trim().toLowerCase();
-        const password = String(credentials.password).trim().toLowerCase();
-        console.log(email, password);
+        const email = String(credentials?.email).trim().toLowerCase();
+        const password = credentials?.password;
+        console.log(email, "$", password);
 
         try {
           const user = await prisma.user.findUnique({

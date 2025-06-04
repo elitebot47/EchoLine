@@ -15,31 +15,35 @@ export default function SignInPage() {
   const [password, setPassword] = useState("");
   const [loader, setLoader] = useState(false);
   async function HandleSubmit() {
+    console.log(`${email.trim().toLowerCase()} ${password.trim()}`);
+
     setLoader(true);
-    const response = await signIn("credentials", {
-      redirect: false,
-      callbackUrl,
-      credentials: {
-        email: email.trim().toLowerCase(),
-        password: password.trim(),
-      },
-    });
+    try {
+      const response = await signIn("credentials", {
+        redirect: false,
+        email: String(email).trim().toLowerCase(),
+        password: String(password).trim(),
+        callbackUrl,
+      }); 
 
-    console.log("response", response);
+      console.log("response", response);
 
-    if (response?.error) {
-      if (response.error === "CredentialsSignin") {
-        toast.error("Invalid email or password");
-        setLoader(false);
-        return;
+      if (response?.error) {
+        if (response.error === "CredentialsSignin") {
+          toast.error("Invalid email or password");
+          setLoader(false);
+          return;
+        }
       }
-    }
-    if (response.ok) {
-      toast.success("Login successful✅");
-      setLoader(false);
-      console.log(callbackUrl);
+      if (response.ok) {
+        toast.success("Login successful✅");
+        setLoader(false);
+        console.log(callbackUrl);
 
-      router.replace(callbackUrl);
+        router.replace(callbackUrl);
+      }
+    } catch (error) {
+      toast.error(`${error}`);
     }
   }
   return (
