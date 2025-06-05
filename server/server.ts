@@ -16,7 +16,9 @@ io.on("connection", (socket) => {
 
   socket.on("Chat_client", (data) => {
     io.to(data.message.roomId).emit("BroadToMembers", data);
-    console.log("roomId", data.message.roomId);
+  });
+  socket.on("UserTyping", (data) => {
+    socket.broadcast.to(data.roomId).emit("UserTypingStatus", data);
   });
   socket.on("joinRoom", (data) => {
     console.log("joinRoom", data);

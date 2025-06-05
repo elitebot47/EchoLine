@@ -59,6 +59,7 @@ export default async function ChatViewPage({
           RoomData={room || null}
         />
       </div>
+      
       <div className="flex-1 w-full sticky  bottom-0 ">
         <MessageInputCard
           Session={session}

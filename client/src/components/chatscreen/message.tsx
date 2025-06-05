@@ -19,10 +19,14 @@ export default function Message({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 5 }}
+      initial={{ opacity: 0, y: 2 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.2 }}
-      className={`w-fit  ${mine ? "ml-auto" : "mr-auto"}`}
+      transition={{ duration: 0.4 }}
+      className={`w-fit border-2 px-5 py-2 rounded-3xl ${
+        mine
+          ? "ml-auto bg-blue-900 text-white "
+          : " bg-blue-600 text-white mr-auto"
+      }`}
     >
       {MessageData.content}
     </motion.div>

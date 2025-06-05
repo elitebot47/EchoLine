@@ -4,7 +4,7 @@ import { SendHorizontalIcon } from "lucide-react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { useSocketStore } from "@/stores/SocketStore";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Session } from "next-auth";
 import { MessageType, RoomType } from "@/types";
 import { useMessagesStore } from "@/stores/MessagesStore";
@@ -47,11 +47,16 @@ export default function MessageInputCard({
     }
   }
   return (
-    <div className="flex w-full justify-center items-center border-2 h-full">
+    <div className="flex w-full justify-center items-center  h-full">
       <div className="flex-9 ">
         <Input
           value={chattext}
-          onChange={(e) => setchattext(e.target.value)}
+          onChange={(e) => {
+            setchattext(e.target.value);
+            if (e.target.value) {
+              socket?.emit("UserTyping", { roomId: RoomData?.id });
+            }
+          }}
           onKeyDown={(e) => e.key === "Enter" && HandleSend()}
         />
       </div>

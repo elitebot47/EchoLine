@@ -22,7 +22,7 @@ export default async function HomeLayout({
         <MyProfileCard />
         <UserList users={users} />
       </section>
-      <section className="flex-3 h-full border-2">{children}</section>
+      <section className="flex-3 h-full ">{children}</section>
     </main>
   );
 }
