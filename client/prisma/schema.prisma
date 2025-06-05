@@ -8,10 +8,46 @@ datasource db {
 }
 
 model User {
-  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  id       String   @id @default(auto()) @map("_id") @db.ObjectId
   name     String
-  email    String @unique
+  email    String   @unique
   password String
+  rooms    String[]
 
   @@map("users")
+}
+
+enum RoomType {
+  private
+  group
+}
+
+model Room {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  participants String[]
+  createdAt    DateTime @default(now())
+  type         RoomType
+  updatedAt    DateTime @updatedAt
+
+  @@map("rooms")
+}
+
+enum ContentType {
+  text
+  image
+  video
+  link
+}
+
+model Message {
+  id          String      @id @default(auto()) @map("_id") @db.ObjectId
+  from        String
+  to          String
+  createdAt   DateTime    @default(now())
+  content     String
+  contentType ContentType
+  updatedAt   DateTime    @updatedAt
+  roomId      String
+
+  @@map("messages")
 }

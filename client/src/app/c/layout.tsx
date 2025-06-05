@@ -1,3 +1,4 @@
+import { auth } from "@/auth";
 import MyProfileCard from "@/components/chatscreen/myprofilecard";
 import UserList from "@/components/chatscreen/userlist";
 import React from "react";
