@@ -2,6 +2,7 @@
 import { MessageType, RoomType } from "@/types";
 import { Session } from "next-auth";
 import Message from "./message";
+import { motion } from "motion/react";
 import { useSocketStore } from "@/stores/SocketStore";
 import { useEffect, useRef } from "react";
 import { useMessagesStore } from "@/stores/MessagesStore";
@@ -16,7 +17,6 @@ export default function ChatViewArea({
   RoomData: RoomType | null;
 }) {
   const socket = useSocketStore((state) => state.socket);
-
   const messages = useMessagesStore((state) => state.messages);
   const addMessage = useMessagesStore((state) => state.addMessage);
   const setMessages = useMessagesStore((state) => state.setMessages);
@@ -56,20 +56,19 @@ export default function ChatViewArea({
     }
   }, [messages]);
 
-  console.log(messages);
-
-  console.log(messages?.map((m) => m.id));
-
   return (
     <div className="border-2 h-full w-full">
       <div
-        className="flex flex-col overflow-y-auto w-full h-full" // Set a fixed height!
+        className="flex flex-col overflow-y-auto w-full h-full"
         ref={chatContainerRef}
       >
         {messages?.map((message) => (
-          <div key={message.id}>
+          <motion.div
+            
+            key={message.id}
+          >
             <Message MessageData={message} Session={Session} />
-          </div>
+          </motion.div>
         ))}
       </div>
     </div>

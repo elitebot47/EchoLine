@@ -24,6 +24,9 @@ export default function MessageInputCard({
   const addMessage = useMessagesStore((state) => state.addMessage);
   const [chattext, setchattext] = useState("");
   async function HandleSend() {
+    if (!chattext) {
+      return;
+    }
     try {
       const res = await axios.post("/api/message/add", {
         content: chattext,
@@ -46,7 +49,11 @@ export default function MessageInputCard({
   return (
     <div className="flex w-full justify-center items-center border-2 h-full">
       <div className="flex-9 ">
-        <Input value={chattext} onChange={(e) => setchattext(e.target.value)} />
+        <Input
+          value={chattext}
+          onChange={(e) => setchattext(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && HandleSend()}
+        />
       </div>
 
       <div className="flex-1  ">

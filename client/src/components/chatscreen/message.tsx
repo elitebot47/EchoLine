@@ -2,7 +2,7 @@
 import { MessageType } from "@/types";
 import { Session } from "next-auth";
 import { useEffect, useState } from "react";
-
+import { motion } from "framer-motion";
 export default function Message({
   MessageData,
   Session,
@@ -18,8 +18,13 @@ export default function Message({
   }, [Session]);
 
   return (
-    <div className={`w-fit  ${mine ? "ml-auto" : "mr-auto"}`}>
+    <motion.div
+      initial={{ opacity: 0, y: 5 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.2 }}
+      className={`w-fit  ${mine ? "ml-auto" : "mr-auto"}`}
+    >
       {MessageData.content}
-    </div>
+    </motion.div>
   );
 }
