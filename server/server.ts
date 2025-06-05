@@ -13,9 +13,18 @@ const io = new Server(server, {
 
 io.on("connection", (socket) => {
   console.log(`user connected:${socket.id}`);
-  socket.on("message_client", (data) => {
-    console.log(data);
-    socket.broadcast.emit("message_server");
+
+  socket.on("Chat_client", (data) => {
+    io.to(data.message.roomId).emit("BroadToMembers", data);
+    console.log("roomId", data.message.roomId);
+  });
+  socket.on("joinRoom", (data) => {
+    console.log("joinRoom", data);
+    socket.join(data);
+  });
+  socket.on("leaveRoom", (data) => {
+    console.log("joinRoom", data);
+    socket.leave(data);
   });
 });
 

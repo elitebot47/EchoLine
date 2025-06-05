@@ -1,4 +1,12 @@
-"use client";
-export default function UserList() {
-  return <div>userlist area</div>;
+import { UserType } from "@/types";
+import UserCard from "./usercard";
+
+export default function UserList({ users }: { users: UserType[] }) {
+  return (
+    <div>
+      {users.map((user) => (
+        <UserCard key={user.id} user={user} />
+      ))}
+    </div>
+  );
 }

@@ -7,6 +7,9 @@ import { useSocketStore } from "@/stores/SocketStore";
 import { useState } from "react";
 import { Session } from "next-auth";
 import { MessageType, RoomType } from "@/types";
+import { useMessagesStore } from "@/stores/MessagesStore";
+import axios from "axios";
+import { toast } from "sonner";
 
 export default function MessageInputCard({
   Session,
@@ -18,16 +21,28 @@ export default function MessageInputCard({
   RoomData: RoomType | null;
 }) {
   const socket = useSocketStore((state) => state.socket);
+  const addMessage = useMessagesStore((state) => state.addMessage);
   const [chattext, setchattext] = useState("");
-  function HandleSend() {
-    const msg = {
-      message: chattext,
-      type: "text",
-      user: Session?.user?.id,
-    };
-    socket?.emit("message_client", msg);
-  }
+  async function HandleSend() {
+    try {
+      const res = await axios.post("/api/message/add", {
+        content: chattext,
+        contentType: "text",
+        roomId: RoomData?.id,
+        to: RoomData?.participants.filter(
+          (user) => user !== Session?.user?.id
+        )[0],
+      });
+      if (res.data.message) {
+        addMessage(res.data);
+      }
 
+      socket?.emit("Chat_client", res.data);
+      setchattext("");
+    } catch (error) {
+      toast.error(`error:${error}`);
+    }
+  }
   return (
     <div className="flex w-full justify-center items-center border-2 h-full">
       <div className="flex-9 ">
@@ -35,7 +50,7 @@ export default function MessageInputCard({
       </div>
 
       <div className="flex-1  ">
-        <Button onClick={HandleSend}>
+        <Button disabled={chattext.length === 0} onClick={HandleSend}>
           <SendHorizontalIcon />
         </Button>
       </div>

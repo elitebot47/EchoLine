@@ -9,7 +9,7 @@ import { toast } from "sonner";
 export default function SignInPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") || "/home";
+  const callbackUrl = searchParams.get("callbackUrl") || "/c";
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -24,7 +24,7 @@ export default function SignInPage() {
         email: String(email).trim().toLowerCase(),
         password: String(password).trim(),
         callbackUrl,
-      }); 
+      });
 
       console.log("response", response);
 

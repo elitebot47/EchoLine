@@ -16,3 +16,9 @@ export type MessageType = {
   updatedAt: Date;
   roomId: string;
 };
+
+export type UserType = {
+  id: string;
+  name: string;
+  rooms: string[];
+};

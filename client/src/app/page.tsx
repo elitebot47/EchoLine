@@ -5,7 +5,7 @@ export default async function Rootpage() {
   const session = await auth();
 
   if (session) {
-    redirect("/home");
+    redirect("/c");
   } else {
     redirect("/signin");
   }
