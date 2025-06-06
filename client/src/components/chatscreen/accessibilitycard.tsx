@@ -7,7 +7,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MenuIcon, Plus, PlusIcon } from "lucide-react";
+import { ArrowLeft, MenuIcon, Plus, PlusIcon } from "lucide-react";
 import { Session } from "next-auth";
 import { signOut } from "next-auth/react";
 import { useState } from "react";
@@ -61,7 +61,7 @@ export default function AccessibilityCard({
           <motion.div
             key={"closebutton"}
             initial={{ rotate: 45, opacity: 0 }}
-            animate={{ rotate: -45, opacity: 1 }}
+            animate={{ rotate: 0, opacity: 1 }}
             exit={{ rotate: 45, opacity: 0 }}
             transition={{ duration: 0.1 }}
           >
@@ -71,20 +71,24 @@ export default function AccessibilityCard({
               }}
               className="group flex w-10 h-10 justify-center items-center rounded-full  cursor-pointer "
             >
-              <PlusIcon className="size-5 transition-transform group-hover:scale-125 " />
+              <ArrowLeft className="size-5 transition-transform group-hover:-translate-x-0.5 group-hover:scale-105 " />
             </Button>
           </motion.div>
         )}
       </AnimatePresence>
-      <div className="w-full   px-3">
+      <motion.div
+        layout
+        transition={{ duration: 0.5 }}
+        className={`w-full px-3 `}
+      >
         <Input
           onClick={() => {
             setSearchpanel(true);
           }}
-          className=" rounded-full text-2xl font-medium w-full"
+          className=" rounded-full  font-medium w-full"
           type="search"
         />
-      </div>
+      </motion.div>
       <AnimatePresence>
         {Searchpanel && (
           <motion.div

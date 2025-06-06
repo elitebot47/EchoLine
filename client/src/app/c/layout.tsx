@@ -19,7 +19,7 @@ export default async function HomeLayout({
   });
   return (
     <main className="flex h-screen">
-      <section className="flex-1 h-full  ">
+      <section className="flex-1 h-full border-r-2  ">
         <AccessibilityCard Session={session} />
         <UserList users={users} />
       </section>
