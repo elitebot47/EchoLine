@@ -16,19 +16,33 @@ export default function Message({
     setmine(mine);
     console.log(mine);
   }, [Session]);
-
+  const time = new Date(MessageData.createdAt).toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
   return (
     <motion.div
-      initial={{ opacity: 0, y: 2 }}
+      initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
-      className={`w-fit border-2 px-5 py-2 rounded-3xl ${
+      className={`w-fit shadow-2xl backdrop-blur-md shadow-gray-400 border-0  flex flex-col  rounded-xl ${
         mine
-          ? "ml-auto bg-blue-900 text-white "
-          : " bg-blue-600 text-white mr-auto"
+          ? "ml-auto bg-blue-900 pr-2 pl-3 pb-1 pt-1.5  text-white "
+          : " bg-blue-600 pl-2 pr-3 pb-1 pt-1  text-white mr-auto"
       }`}
     >
-      {MessageData.content}
+      <div
+        className={`${mine ? "self-end" : "self-start"}  font-medium text-lg`}
+      >
+        {MessageData.content}
+      </div>
+      <div
+        className={`${
+          mine ? "self-end" : "self-start"
+        }  font-light text-xs text-[10px]`}
+      >
+        {time}
+      </div>
     </motion.div>
   );
 }

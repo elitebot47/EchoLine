@@ -21,7 +21,6 @@ export default function ChatViewArea({
   const addMessage = useMessagesStore((state) => state.addMessage);
   const setMessages = useMessagesStore((state) => state.setMessages);
   const chatContainerRef = useRef<HTMLDivElement>(null);
-  const [Typingstatus, setTypingstatus] = useState(false);
 
   useEffect(() => {
     setMessages(Messages?.filter(Boolean) ?? []);
@@ -31,26 +30,6 @@ export default function ChatViewArea({
     socket?.emit("joinRoom", `${RoomData?.id}`);
     return () => {
       socket.emit("leaveRoom", `${RoomData?.id}`);
-    };
-  }, [socket, RoomData]);
-
-  useEffect(() => {
-    if (!socket || !RoomData) return;
-
-    let typingTimeout: NodeJS.Timeout | undefined;
-
-    const handler = () => {
-      setTypingstatus(true);
-      if (typingTimeout) clearTimeout(typingTimeout);
-      typingTimeout = setTimeout(() => setTypingstatus(false), 1000);
-    };
-
-    socket.on("UserTypingStatus", handler);
-
-    return () => {
-      socket.off("UserTypingStatus", handler);
-      if (typingTimeout) clearTimeout(typingTimeout);
-      setTypingstatus(false);
     };
   }, [socket, RoomData]);
 
@@ -79,14 +58,16 @@ export default function ChatViewArea({
   }, [messages]);
 
   return (
-    <div
+    <motion.div
+      initial={{ opacity: 0, x: -50 }}
+      animate={{ opacity: 1, x: 0 }}
       className={`${
         messages?.length === 0 ? "bg-green-500 text-black" : "bg-gray-200"
       } h-full w-full `}
     >
       <div
         className="flex flex-col lg:px-16 px-3 py-3
-          overflow-y-auto w-full gap-1.5 h-full"
+          overflow-y-auto w-full  gap-1.5 overflow-hidden overflow-x-hidden scroll-smooth h-full"
         ref={chatContainerRef}
       >
         {messages?.length === 0 && (
@@ -100,20 +81,8 @@ export default function ChatViewArea({
               <Message MessageData={message} Session={Session} />
             </motion.div>
           ))}
-
-          {Typingstatus && (
-            <motion.div
-              initial={{ x: -10, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: -10, opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              className={`w-24 bg-gray-500   border-2 backdrop-blur-2xl px-5 py-1 rounded-3xl mr-auto `}
-            >
-              <span className="dot-flashing">typing</span>
-            </motion.div>
-          )}
         </AnimatePresence>
       </div>
-    </div>
+    </motion.div>
   );
 }

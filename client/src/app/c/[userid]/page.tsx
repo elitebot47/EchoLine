@@ -11,6 +11,9 @@ export default async function ChatViewPage({
   const session = await auth();
   const { userid } = await params;
   const myId = session?.user?.id;
+  if (userid === myId) {
+    return <div>Chat Unavailable , you cant message yourself</div>;
+  }
   let room;
   let userdata;
   try {
@@ -59,7 +62,7 @@ export default async function ChatViewPage({
           RoomData={room || null}
         />
       </div>
-      
+
       <div className="flex-1 w-full sticky  bottom-0 ">
         <MessageInputCard
           Session={session}

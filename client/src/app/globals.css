@@ -1,27 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-@custom-variant dark (&:is(.dark *));
-.dot-flashing {
-  margin-left: 4px;
-  width: 8px;
-  height: 8px;
-  border-radius: 5px;
-  background-color: #a3a3a3;
-  color: white;
-  animation: dotFlashing 1s infinite linear alternate;
-  display: inline-block;
-}
-@keyframes dotFlashing {
-  0% {
-    opacity: 0.2;
-  }
-  50%,
-  100% {
-    opacity: 1;
-  }
-}
-
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);

@@ -1,12 +1,16 @@
 import { UserType } from "@/types";
 import UserCard from "./usercard";
+import { auth } from "@/auth";
 
-export default function UserList({ users }: { users: UserType[] }) {
+export default async function UserList({ users }: { users: UserType[] }) {
+  const session = await auth();
   return (
     <div>
-      {users.map((user) => (
-        <UserCard key={user.id} user={user} />
-      ))}
+      {users
+        .filter((user) => user.id !== session?.user?.id)
+        .map((user) => (
+          <UserCard key={user.id} user={user} />
+        ))}
     </div>
   );
 }
