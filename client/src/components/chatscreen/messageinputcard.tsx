@@ -70,7 +70,7 @@ export default function MessageInputCard({
     }
   }
   return (
-    <div className="flex w-full justify-center items-center relative  h-full">
+    <div className="flex w-full gap-2 justify-center items-center relative p-2 h-full">
       <AnimatePresence>
         {Typingstatus && (
           <motion.div
@@ -86,24 +86,22 @@ export default function MessageInputCard({
           </motion.div>
         )}
       </AnimatePresence>
-      <div className="flex-9 ">
-        <Input
-          value={chattext}
-          onChange={(e) => {
-            setchattext(e.target.value);
-            if (e.target.value) {
-              socket?.emit("UserTyping", { roomId: RoomData?.id });
-            }
-          }}
-          onKeyDown={(e) => e.key === "Enter" && HandleSend()}
-        />
-      </div>
+      <Input
+        className=" w-full !text-xl
+         focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus:border-0 focus:outline-none hover:ring-0 ring-0 border-0  text-white"
+        value={chattext}
+        onChange={(e) => {
+          setchattext(e.target.value);
+          if (e.target.value) {
+            socket?.emit("UserTyping", { roomId: RoomData?.id });
+          }
+        }}
+        onKeyDown={(e) => e.key === "Enter" && HandleSend()}
+      />
 
-      <div className="flex-1  ">
-        <Button disabled={chattext.length === 0} onClick={HandleSend}>
-          <SendHorizontalIcon />
-        </Button>
-      </div>
+      <Button disabled={chattext.length === 0} onClick={HandleSend}>
+        <SendHorizontalIcon />
+      </Button>
     </div>
   );
 }

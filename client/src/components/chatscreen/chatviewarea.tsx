@@ -1,10 +1,11 @@
 "use client";
+import { animateScroll as scroll } from "react-scroll";
 import { MessageType, RoomType } from "@/types";
 import { Session } from "next-auth";
 import Message from "./message";
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, easeOut, motion } from "motion/react";
 import { useSocketStore } from "@/stores/SocketStore";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useMessagesStore } from "@/stores/MessagesStore";
 
 export default function ChatViewArea({
@@ -25,6 +26,7 @@ export default function ChatViewArea({
   useEffect(() => {
     setMessages(Messages?.filter(Boolean) ?? []);
   }, [Messages, setMessages]);
+
   useEffect(() => {
     if (!socket || !RoomData) return;
     socket?.emit("joinRoom", `${RoomData?.id}`);
@@ -36,53 +38,53 @@ export default function ChatViewArea({
   useEffect(() => {
     if (!socket) return;
     const handler = (data: any) => {
-      console.log("data", data.message);
       if (data.message) {
         addMessage(data.message);
       }
     };
-
     socket.on("BroadToMembers", handler);
-
     return () => {
-      console.log("cleanup after adding message");
-
       socket.off("BroadToMembers", handler);
     };
   }, [socket, addMessage]);
+
   useEffect(() => {
-    if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTop =
-        chatContainerRef.current.scrollHeight;
-    }
+    scroll.scrollToBottom({
+      containerId: "chat-container",
+      duration: 200,
+      smooth: true,
+    });
   }, [messages]);
 
   return (
-    <motion.div
-      initial={{ opacity: 0, x: -50 }}
-      animate={{ opacity: 1, x: 0 }}
-      className={`${
-        messages?.length === 0 ? "bg-green-500 text-black" : "bg-gray-200"
-      } h-full w-full `}
-    >
-      <div
-        className="flex flex-col lg:px-16 px-3 py-3
-          overflow-y-auto w-full  gap-1.5 overflow-hidden overflow-x-hidden scroll-smooth h-full"
-        ref={chatContainerRef}
+    <div className="relative h-full w-full overflow-hidden">
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ ease: "easeInOut", duration: 0.7 }}
+        className={`origin-left ${
+          messages?.length === 0 ? "bg-green-500" : "bg-gray-200"
+        } h-full w-full`}
       >
-        {messages?.length === 0 && (
-          <div className="text-5xl flex justify-center items-center">
-            say hi , this will be your first message to this person lets go😎
-          </div>
-        )}
-        <AnimatePresence>
-          {messages?.map((message) => (
-            <motion.div key={message.id}>
-              <Message MessageData={message} Session={Session} />
-            </motion.div>
-          ))}
-        </AnimatePresence>
-      </div>
-    </motion.div>
+        <div
+          id="chat-container"
+          ref={chatContainerRef}
+          className="flex flex-col py-20 lg:px-16 px-3  overflow-y-auto w-full gap-1.5 h-full"
+        >
+          {messages?.length === 0 && (
+            <div className="text-5xl flex justify-center items-center">
+              say hi, this will be your first message to this person lets go😎
+            </div>
+          )}
+          <AnimatePresence>
+            {messages?.map((message) => (
+              <motion.div key={message.id}>
+                <Message MessageData={message} Session={Session} />
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        </div>
+      </motion.div>
+    </div>
   );
 }

@@ -50,12 +50,12 @@ export default async function ChatViewPage({
       })
     : [];
   return (
-    <div className="flex-col flex h-screen w-full relative">
-      <div className="flex-1 w-full flex gap-9">
+    <div className="flex-col   flex h-screen w-full relative">
+      <div className=" h-14 text-white backdrop-blur-md bg-black/80 z-10 w-full absolute flex gap-9">
         <div>{userid}</div>
         <div className="border-2">{userdata?.name}</div>
       </div>
-      <div className="flex-[9] w-full overflow-auto">
+      <div className="h-full   w-full overflow-auto">
         <ChatViewArea
           Session={session}
           Messages={messages}
@@ -63,7 +63,7 @@ export default async function ChatViewPage({
         />
       </div>
 
-      <div className="flex-1 w-full sticky  bottom-0 ">
+      <div className="w-full h-14  z-10 absolute backdrop-blur-md bg-black/80  bottom-0 ">
         <MessageInputCard
           Session={session}
           Messages={messages}

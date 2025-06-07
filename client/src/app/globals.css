@@ -1,6 +1,21 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+#chat-container {
+  overflow-y: scroll;
+  -webkit-overflow-scrolling: touch;
+}
+#chat-container::-webkit-scrollbar {
+  width: 7px;
+}
 
+#chat-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#chat-container::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);

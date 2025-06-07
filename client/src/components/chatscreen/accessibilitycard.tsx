@@ -10,19 +10,48 @@ import {
 import { ArrowLeft, MenuIcon, Plus, PlusIcon } from "lucide-react";
 import { Session } from "next-auth";
 import { signOut } from "next-auth/react";
-import { useState } from "react";
-// import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { AnimatePresence, motion } from "framer-motion";
+import { UserType } from "@/types";
+import UserCard from "./usercard";
 
 export default function AccessibilityCard({
   Session,
+  users,
 }: {
   Session: Session | null;
+  users: UserType[];
 }) {
+  const [inputtext, setInputtext] = useState("");
+  const UsersRef = useRef(users.filter((user) => user.id != Session?.user?.id));
+  const [SearchedUsers, setSearchedUsers] = useState<UserType[]>([]);
   const [Searchpanel, setSearchpanel] = useState(false);
+
+  useEffect(() => {
+    if (!inputtext.trim()) {
+      setSearchedUsers([]);
+      return;
+    }
+    let searchtimeout;
+    if (searchtimeout) {
+      clearTimeout(searchtimeout);
+    }
+    searchtimeout = setTimeout(() => {
+      setSearchedUsers(
+        UsersRef.current.filter((user) =>
+          user.name.toLowerCase().includes(inputtext.toLowerCase())
+        )
+      );
+    }, 700);
+
+    return () => {
+      clearTimeout(searchtimeout);
+    };
+  }, [inputtext]);
+
   return (
     <div className="flex h-12 relative  w-full items-center px-2">
       <AnimatePresence mode="wait">
@@ -68,6 +97,7 @@ export default function AccessibilityCard({
             <Button
               onClick={() => {
                 setSearchpanel(false);
+                setInputtext("");
               }}
               className="group flex w-10 h-10 justify-center items-center rounded-full  cursor-pointer "
             >
@@ -82,9 +112,11 @@ export default function AccessibilityCard({
         className={`w-full px-3 `}
       >
         <Input
+          onChange={(e) => setInputtext(e.target.value)}
           onClick={() => {
             setSearchpanel(true);
           }}
+          value={inputtext}
           className=" rounded-full  font-medium w-full"
           type="search"
         />
@@ -97,7 +129,11 @@ export default function AccessibilityCard({
             exit={{ opacity: 0 }}
             className="h-[93vh] origin-left absolute left-0 top-full  w-full  bg-white shadow-lg border z-10"
           >
-            <div className="p-4">this is the search panel</div>
+            <div className="">
+              {SearchedUsers.map((user) => (
+                <UserCard key={user.id} user={user} />
+              ))}
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

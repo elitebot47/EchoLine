@@ -20,10 +20,15 @@ export default async function HomeLayout({
   return (
     <main className="flex h-screen">
       <section className="flex-1 h-full border-r-2  ">
-        <AccessibilityCard Session={session} />
+        <AccessibilityCard users={users} Session={session} />
         <UserList users={users} />
       </section>
-      <section className="flex-3 h-full ">{children}</section>
+      <section
+        className="flex-3 h-full 
+       "
+      >
+        {children}
+      </section>
     </main>
   );
 }
