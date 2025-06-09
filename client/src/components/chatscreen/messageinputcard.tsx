@@ -53,6 +53,7 @@ export default function MessageInputCard({
       setTypingstatus(false);
     };
   }, [socket, id]);
+
   async function HandleSend() {
     setTypingstatus(false);
     if (!chattext) {
@@ -64,26 +65,28 @@ export default function MessageInputCard({
       links.length > 0 && links[0].type === "url" ? "link" : "text";
 
     try {
+      const recipient = participants.find(
+        (user) => user.user.id !== session?.user?.id
+      );
+      if (!recipient) {
+        toast.error("Error:Connection error ,please try again later");
+        return;
+      }
       const res = await axios.post("/api/message/add", {
         content: String(chattext),
         contentType: String(detectedContentType),
         roomId: String(id),
-        toId: participants.filter(
-          (user) => user.user.id !== session?.user?.id
-        )[0].user.id,
+        toId: String(recipient.user.id),
       });
-      console.log(res.data);
 
       if (res.data.message) {
-        console.log(res.data);
-
         addMessage(res.data);
       }
 
       socket?.emit("Chat_client", res.data);
       setchattext("");
     } catch (error) {
-      toast.error(`error:${error}`);
+      toast.error(`error:Failed to send message`);
     }
   }
   return (

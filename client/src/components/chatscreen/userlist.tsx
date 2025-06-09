@@ -21,15 +21,9 @@ export default function UserList() {
 
   return (
     <div>
-      {users
-        .filter((user) => user.user.id !== session?.user?.id)
-        .map((user) => (
-          <UserCard
-            key={user.user.id}
-            user={user.user}
-            currentUserId={session?.user?.id}
-          />
-        ))}
+      {users.map((user) => (
+        <UserCard key={user.id} user={user} currentUserId={session?.user?.id} />
+      ))}
     </div>
   );
 }

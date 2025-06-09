@@ -3,26 +3,52 @@ import { prisma } from "@/lib/prisma";
 import { getUser } from "@/lib/dal";
 
 export async function GET(req: NextRequest) {
-  const User = await getUser();
-  if (!User) return NextResponse.json({ users: [] });
+  try {
+    const User = await getUser();
 
-  const users = await prisma.roomParticipant.findMany({
-    where: {
-      room: {
-        participants: {
-          some: {
-            userId: User.id,
+    if (!User?.id) {
+      return NextResponse.json(
+        { message: "Unauthorized - Please login" },
+        { status: 401 }
+      );
+    }
+
+    const participants = await prisma.roomParticipant.findMany({
+      where: {
+        room: {
+          participants: {
+            some: {
+              userId: User.id,
+            },
+          },
+        },
+        NOT: {
+          userId: User.id,
+        },
+      },
+      select: {
+        roomId: true,
+        user: {
+          select: {
+            id: true,
+            name: true,
           },
         },
       },
-    },
-    select: {
-      roomId: true,
-      user: {
-        select: { id: true, name: true },
-      },
-    },
-  });
+    });
 
-  return NextResponse.json({ users });
+    const users = participants.map((p) => ({
+      id: p.user.id,
+      name: p.user.name,
+      roomId: p.roomId,
+    }));
+
+    return NextResponse.json({ users });
+  } catch (error) {
+    console.error("Failed to fetch users:", error);
+    return NextResponse.json(
+      { message: "Internal server error" },
+      { status: 500 }
+    );
+  }
 }

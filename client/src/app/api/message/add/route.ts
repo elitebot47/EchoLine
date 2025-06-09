@@ -1,23 +1,24 @@
 import { auth } from "@/auth";
-import { getUser } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
+import { MessageCreateSchema } from "@/lib/schemas/message";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
-  const { content, contentType, roomId, toId }: any = await req.json();
-
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ message: "Not authenticated" }, { status: 401 });
   }
-  let message;
+  const result = MessageCreateSchema.safeParse(await req.json());
+  if (!result.success) {
+    return NextResponse.json(
+      { message: result.error.flatten().fieldErrors },
+      { status: 400 }
+    );
+  }
   try {
-    message = await prisma.message.create({
+    const message = await prisma.message.create({
       data: {
-        content: String(content),
-        contentType,
-        roomId,
-        toId,
+        ...result.data,
         fromId: session.user.id,
       },
       select: {
@@ -30,8 +31,8 @@ export async function POST(req: NextRequest) {
         contentType: true,
       },
     });
+    return NextResponse.json({ message });
   } catch (error) {
     return NextResponse.json({ message: `error:${error}` }, { status: 501 });
   }
-  return NextResponse.json({ message });
 }
