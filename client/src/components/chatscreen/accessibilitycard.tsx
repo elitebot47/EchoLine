@@ -16,29 +16,28 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ArrowLeft, MenuIcon, Plus, PlusIcon } from "lucide-react";
-import { signOut } from "next-auth/react";
+import { ArrowLeft, MenuIcon } from "lucide-react";
+import { signOut, useSession } from "next-auth/react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { AnimatePresence, motion } from "framer-motion";
-import { UserType } from "@/types";
+import { MinimalUser, UserType } from "@/types";
 import UserCard from "./usercard";
 import SettingPage from "@/app/settings/page";
 
-export default function AccessibilityCard({
-  user,
-  users,
-}: {
-  user: any;
-  users: any;
-}) {
-  console.log("users from assec card:");
+export default function AccessibilityCard({ users }: { users: MinimalUser[] }) {
+  const { data: session } = useSession();
+  if (!session) {
+    return <div>Not authenticated</div>;
+  }
 
   const [inputtext, setInputtext] = useState("");
-  const UsersRef = useRef(users.filter((User: any) => User.id != user.id));
-  const [SearchedUsers, setSearchedUsers] = useState<UserType[]>([]);
+  const UsersRef = useRef(
+    users.filter((User: any) => User.id != session?.user?.id)
+  );
+  const [SearchedUsers, setSearchedUsers] = useState<MinimalUser[]>([]);
   const [Searchpanel, setSearchpanel] = useState(false);
   const [settingpage, setSettingpage] = useState(false);
 
@@ -81,7 +80,7 @@ export default function AccessibilityCard({
                 <MenuIcon className="hover:scale-110 duration-500" size={35} />
               </DropdownMenuTrigger>
               <DropdownMenuContent>
-                <DropdownMenuLabel>{user.name}</DropdownMenuLabel>
+                <DropdownMenuLabel>{session.user?.name}</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>Saved Chats</DropdownMenuItem>
                 <DropdownMenuItem>Settings</DropdownMenuItem>

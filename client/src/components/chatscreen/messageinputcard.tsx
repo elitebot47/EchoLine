@@ -1,6 +1,6 @@
 "use client";
 
-import { SendHorizontalIcon } from "lucide-react";
+import { LucidePaperclip, SendHorizontalIcon } from "lucide-react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { useSocketStore } from "@/stores/SocketStore";
@@ -10,18 +10,32 @@ import axios from "axios";
 import { toast } from "sonner";
 import { AnimatePresence, motion } from "framer-motion";
 import { useSession } from "next-auth/react";
+import { find } from "linkifyjs";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+type MinimalParticipant = { user: { id: string; name: string } };
 
-export default function MessageInputCard({ RoomData }: { RoomData: any }) {
+type MessageInputCardProps = {
+  id: string;
+  participants: MinimalParticipant[];
+};
+export default function MessageInputCard({
+  id,
+  participants,
+}: MessageInputCardProps) {
   const { data: session } = useSession();
-  console.log("RoomData", RoomData);
 
   const socket = useSocketStore((state) => state.socket);
   const addMessage = useMessagesStore((state) => state.addMessage);
   const [chattext, setchattext] = useState("");
   const [Typingstatus, setTypingstatus] = useState(false);
-
+  // const [contentType, setContentType] = useState("");
   useEffect(() => {
-    if (!socket || !RoomData) return;
+    if (!socket || !id) return;
 
     let typingTimeout: NodeJS.Timeout | undefined;
 
@@ -38,22 +52,31 @@ export default function MessageInputCard({ RoomData }: { RoomData: any }) {
       if (typingTimeout) clearTimeout(typingTimeout);
       setTypingstatus(false);
     };
-  }, [socket, RoomData]);
+  }, [socket, id]);
   async function HandleSend() {
     setTypingstatus(false);
     if (!chattext) {
       return;
     }
+    const links = find(`${chattext}`);
+
+    const detectedContentType =
+      links.length > 0 && links[0].type === "url" ? "link" : "text";
+
     try {
       const res = await axios.post("/api/message/add", {
         content: String(chattext),
-        contentType: "text",
-        roomId: String(RoomData?.id),
-        toId: RoomData?.participants.filter(
+        contentType: String(detectedContentType),
+        roomId: String(id),
+        toId: participants.filter(
           (user) => user.user.id !== session?.user?.id
         )[0].user.id,
       });
+      console.log(res.data);
+
       if (res.data.message) {
+        console.log(res.data);
+
         addMessage(res.data);
       }
 
@@ -81,19 +104,37 @@ export default function MessageInputCard({ RoomData }: { RoomData: any }) {
         )}
       </AnimatePresence>
       <Input
-        className=" w-full !text-xl
+        className=" rounded-full lg:rounded-lg  h-full w-full lg:!text-xl !text-2xl
          focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus:border-0 focus:outline-none hover:ring-0 ring-0 border-0  text-white"
         value={chattext}
         onChange={(e) => {
           setchattext(e.target.value);
           if (e.target.value) {
-            socket?.emit("UserTyping", { roomId: RoomData?.id });
+            socket?.emit("UserTyping", { roomId: id });
           }
         }}
         onKeyDown={(e) => e.key === "Enter" && HandleSend()}
       />
 
-      <Button disabled={chattext.length === 0} onClick={HandleSend}>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            size={"icon"}
+            className="lg:w-16 lg:h-10 w-14 h-12  cursor-pointer"
+          >
+            <LucidePaperclip />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="mb-1">
+          <DropdownMenuItem>Images</DropdownMenuItem>
+          <DropdownMenuItem>Document</DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+      <Button
+        className={`w-14 lg:w-16 lg:h-10 h-12  cursor-pointer`}
+        disabled={chattext.length === 0}
+        onClick={HandleSend}
+      >
         <SendHorizontalIcon />
       </Button>
     </div>

@@ -1,12 +1,18 @@
 "use client";
+import { useShowChatStore } from "@/stores/showChatStore";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 export default function UserCard({ user, currentUserId }: any) {
   const pathname = usePathname();
+  const setShowChat = useShowChatStore((state) => state.setShowChat);
 
   return (
-    <Link className="w-full" href={`/c/${user.id}`}>
+    <Link
+      onClick={() => setShowChat(true)}
+      className="w-full"
+      href={`/c/${user.id}`}
+    >
       <div
         className={` ${
           pathname == `/c/${user.id}` && "text-white bg-black/80"

@@ -1,7 +1,9 @@
+import ChatScreenHeader from "@/components/chatscreen/ChatScreenHeader";
 import ChatViewArea from "@/components/chatscreen/chatviewarea";
 import MessageInputCard from "@/components/chatscreen/messageinputcard";
 import { getUser } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
+import { MinimalMessage } from "@/types";
 
 export default async function ChatViewPage({
   params,
@@ -15,10 +17,9 @@ export default async function ChatViewPage({
   }
   const myId = User.id;
   if (userid === myId) {
-    return <div>Chat Unavailable , you cant message yourself</div>;
+    return <div>Chat Unavailable, you can't message yourself</div>;
   }
   let room;
-  let userdata;
   try {
     room = await prisma.room.findFirst({
       where: {
@@ -30,6 +31,10 @@ export default async function ChatViewPage({
         },
       },
       select: {
+        id: true,
+        type: true,
+        createdAt: true,
+        updatedAt: true,
         participants: {
           select: {
             user: {
@@ -40,8 +45,18 @@ export default async function ChatViewPage({
             },
           },
         },
-        messages: true,
-        id: true,
+        messages: {
+          select: {
+            id: true,
+            roomId: true,
+            fromId: true,
+            toId: true,
+            createdAt: true,
+            content: true,
+            contentType: true,
+            updatedAt: true,
+          },
+        },
       },
     });
     if (!room) {
@@ -51,42 +66,59 @@ export default async function ChatViewPage({
           participants: { create: [{ userId: myId }, { userId: userid }] },
         },
         select: {
+          id: true,
+          type: true,
+          createdAt: true,
+          updatedAt: true,
           participants: {
             select: {
-              user: {
-                select: {
-                  id: true,
-                  name: true,
-                },
-              },
+              id: true,
+              userId: true,
+              roomId: true,
+              room: { select: { id: true } },
+              user: { select: { id: true, name: true } },
             },
           },
-          messages: true,
-          id: true,
+          messages: {
+            select: {
+              id: true,
+              roomId: true,
+              fromId: true,
+              toId: true,
+              createdAt: true,
+              content: true,
+              contentType: true,
+              updatedAt: true,
+            },
+          },
         },
       });
     }
   } catch (error) {
-    return <div>{`Unexpected Error occured: ${error}`}</div>;
+    return <div>{`Unexpected Error occurred: ${error}`}</div>;
+  }
+
+  if (!room) {
+    return <div>Room not found or could not be created.</div>;
   }
 
   return (
-    <div className="flex-col   flex h-screen w-full relative">
-      <div className=" h-14 text-white backdrop-blur-md  items-center bg-black/80 z-10 w-full absolute flex gap-9">
-        <div className="border-2">
-          {room?.participants
-            .filter((user) => user.user.id !== User.id)
-            .map((userinfo) => (
-              <div key={userinfo.user.id}>{userinfo.user.name}</div>
-            ))}
-        </div>
+    <div className="flex flex-col h-screen  w-full">
+      <div className="h-14 text-white backdrop-blur-md items-center bg-black/70 z-10 w-full flex gap-9">
+        <ChatScreenHeader users={room.participants.map((p) => p.user)} />
       </div>
-      <div className="h-full   w-full overflow-auto">
-        <ChatViewArea Messages={room?.messages} RoomData={room} />
+      <div className="flex-1 w-full overflow-auto">
+        <ChatViewArea
+          Messages={
+            room?.messages.filter(
+              (msg) => msg.toId !== null
+            ) as MinimalMessage[]
+          }
+          roomId={room.id}
+        />
       </div>
-
-      <div className="w-full h-14  z-10 absolute backdrop-blur-md bg-black/80  bottom-0 ">
-        <MessageInputCard RoomData={room} />
+      <div className="w-full lg:h-14 h-16 z-10 backdrop-blur-md bg-black/70">
+        <MessageInputCard id={room.id} participants={room.participants} />
       </div>
     </div>
   );

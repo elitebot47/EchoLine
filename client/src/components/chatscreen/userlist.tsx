@@ -1,39 +1,33 @@
+import { useEffect, useState } from "react";
 import UserCard from "./usercard";
-import { prisma } from "@/lib/prisma";
-import { getUser } from "@/lib/dal";
+import { useSession } from "next-auth/react";
+import axios from "axios";
+import { RoomParticipantType } from "@/types";
 
-export default async function UserList() {
-  const User = await getUser();
-  if (!User) {
-    return;
+export default function UserList() {
+  const [users, setUsers] = useState<RoomParticipantType[]>([]);
+  const { data: session } = useSession();
+  if (!session) {
+    return <div>Not authenticated</div>;
   }
-  const users = await prisma.roomParticipant.findMany({
-    where: {
-      room: {
-        participants: {
-          some: {
-            userId: User.id,
-          },
-        },
-      },
-    },
-    select: {
-      roomId: true,
-      user: {
-        select: { id: true, name: true },
-      },
-    },
-  });
+
+  useEffect(() => {
+    async function Getusers() {
+      const res = await axios.get(`/api/knownusers`);
+      setUsers(res.data.users);
+    }
+    Getusers();
+  }, []);
 
   return (
     <div>
       {users
-        .filter((user) => user.user.id !== User.id)
+        .filter((user) => user.user.id !== session?.user?.id)
         .map((user) => (
           <UserCard
             key={user.user.id}
             user={user.user}
-            currentUserId={User.id}
+            currentUserId={session?.user?.id}
           />
         ))}
     </div>

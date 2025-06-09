@@ -5,11 +5,11 @@ type SocketStoreType = {
   socket: Socket | null;
   initializesocket: () => void;
 };
-const port = 3002;
+const port = 4000;
 export const useSocketStore = create<SocketStoreType>((set) => ({
   socket: null,
   initializesocket: () => {
-    const socketinstance = io(`http://localhost:${port}`);
+    const socketinstance = io(`192.168.1.3:${port}`);
     set({ socket: socketinstance });
   },
 }));

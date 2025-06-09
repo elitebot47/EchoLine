@@ -1,15 +1,30 @@
 export type RoomType = {
   id: string;
-  participants: string[];
   createdAt: Date;
   type: "private" | "group";
   updatedAt: Date;
+  participants: RoomParticipantType[];
+  messages: MessageType[];
 };
-
+export type MinimalUser = Pick<UserType, "id" | "name">;
+export type MinimalMessage = Pick<
+  MessageType,
+  | "id"
+  | "roomId"
+  | "fromId"
+  | "toId"
+  | "createdAt"
+  | "content"
+  | "contentType"
+  | "updatedAt"
+>;
 export type MessageType = {
   id: string;
   from: string;
   to: string;
+  toId: string;
+  fromId: string;
+  room: RoomType;
   createdAt: Date;
   content: string;
   contentType: "text" | "image" | "video" | "link";
@@ -17,8 +32,18 @@ export type MessageType = {
   roomId: string;
 };
 
+export type RoomParticipantType = {
+  id: string;
+  userId: string;
+  roomId: string;
+  room: RoomType;
+  user: UserType;
+};
 export type UserType = {
   id: string;
   name: string;
-  rooms: string[];
+  rooms: RoomParticipantType[];
+  email: string;
+  messageFrom: MessageType[];
+  messagesTo: MessageType[];
 };

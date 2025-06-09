@@ -16,6 +16,8 @@ model User {
   rooms        RoomParticipant[]
   messagesFrom Message[]         @relation("MessagesFrom")
   messagesTo   Message[]         @relation("MessagesTo")
+
+  @@index([name])
 }
 
 model Room {
@@ -45,8 +47,8 @@ model Message {
   id          String      @id @default(uuid()) @db.Uuid
   from        User        @relation("MessagesFrom", fields: [fromId], references: [id])
   fromId      String      @db.Uuid
-  to          User?       @relation("MessagesTo", fields: [toId], references: [id])
-  toId        String?     @db.Uuid
+  to          User        @relation("MessagesTo", fields: [toId], references: [id])
+  toId        String      @db.Uuid
   createdAt   DateTime    @default(now())
   content     String
   contentType ContentType
@@ -54,7 +56,10 @@ model Message {
   room        Room        @relation(fields: [roomId], references: [id])
   roomId      String      @db.Uuid
 
-  @@index([roomId])
+  @@index([roomId, createdAt(sort: Desc)])
+  @@index([fromId, createdAt(sort: Desc)])
+  @@index([roomId, fromId])
+  @@index([createdAt(sort: Desc)])
 }
 
 enum RoomType {

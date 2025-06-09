@@ -1,24 +1,25 @@
 "use client";
-import { MessageType } from "@/types";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+
 export default function Message({
   MessageData,
   MyId,
 }: {
-  MessageData: MessageType;
+  MessageData: any;
   MyId: string;
 }) {
   const [mine, setmine] = useState(false);
   useEffect(() => {
-    const mine = MyId === MessageData.from;
+    const mine = MyId === MessageData.fromId;
     setmine(mine);
-    console.log(mine);
   }, [MyId]);
+
   const time = new Date(MessageData.createdAt).toLocaleTimeString([], {
     hour: "2-digit",
     minute: "2-digit",
   });
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -33,7 +34,18 @@ export default function Message({
       <div
         className={`${mine ? "self-end" : "self-start"}  font-medium text-lg`}
       >
-        {MessageData.content}
+        {MessageData.contentType === "link" ? (
+          <a
+            className="text-gray-800  hover:underline underline-offset-2 break-all"
+            href={MessageData.content}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {MessageData.content}
+          </a>
+        ) : (
+          <div>{MessageData.content}</div>
+        )}
       </div>
       <div
         className={`${

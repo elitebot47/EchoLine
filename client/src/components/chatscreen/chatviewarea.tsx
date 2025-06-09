@@ -6,14 +6,14 @@ import { useSocketStore } from "@/stores/SocketStore";
 import { useEffect, useRef } from "react";
 import { useMessagesStore } from "@/stores/MessagesStore";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/router";
+import { MinimalMessage } from "@/types";
 
 export default function ChatViewArea({
   Messages,
-  RoomData,
+  roomId,
 }: {
-  Messages: any;
-  RoomData: any;
+  Messages: MinimalMessage[];
+  roomId: string;
 }) {
   const { data: session } = useSession();
 
@@ -28,12 +28,12 @@ export default function ChatViewArea({
   }, [Messages, setMessages]);
 
   useEffect(() => {
-    if (!socket || !RoomData) return;
-    socket?.emit("joinRoom", `${RoomData?.id}`);
+    if (!socket || !roomId) return;
+    socket?.emit("joinRoom", `${roomId}`);
     return () => {
-      socket.emit("leaveRoom", `${RoomData?.id}`);
+      socket.emit("leaveRoom", `${roomId}`);
     };
-  }, [socket, RoomData]);
+  }, [socket, roomId]);
 
   useEffect(() => {
     if (!socket) return;
@@ -63,13 +63,13 @@ export default function ChatViewArea({
         animate={{ opacity: 1 }}
         transition={{ ease: "easeInOut", duration: 0.7 }}
         className={`origin-left ${
-          messages?.length === 0 ? "bg-green-500" : "bg-gray-200"
-        } h-full w-full`}
+          messages?.length === 0 ? "bg-green-500/50" : "bg-gray-500/50"
+        } h-full  w-full`}
       >
         <div
           id="chat-container"
           ref={chatContainerRef}
-          className="flex flex-col py-20 lg:px-16 px-3  overflow-y-auto w-full gap-1.5 h-full"
+          className="flex flex-col  lg:px-16 px-3  overflow-y-auto w-full gap-1.5 h-full"
         >
           {messages?.length === 0 && (
             <div className="text-5xl flex justify-center items-center">
