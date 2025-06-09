@@ -2,6 +2,7 @@ import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { prisma } from "./lib/prisma";
 import { JWT } from "next-auth/jwt";
+import { VerifyPassword } from "./lib/hash";
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
     Credentials({
@@ -17,12 +18,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         },
       },
       async authorize(credentials) {
-        // if (!credentials.email || !credentials.password) {
-        //   return null;
-        // }
-
         const email = String(credentials?.email).trim().toLowerCase();
-        const password = credentials?.password;
+        const password = String(credentials?.password).trim();
         console.log(email, "$", password);
 
         try {
@@ -31,8 +28,15 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
               email,
             },
           });
+          if (!user?.password) {
+            return null;
+          }
+          const passwordCorrect = await VerifyPassword(
+            user?.password,
+            password
+          );
           console.log(`user:${user}`);
-          if (!user || user.password !== password) return null;
+          if (!user || !passwordCorrect) return null;
           console.log(`user:${user}`);
 
           if (!user) return null;

@@ -1,21 +1,20 @@
 "use client";
 import { MessageType } from "@/types";
-import { Session } from "next-auth";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 export default function Message({
   MessageData,
-  Session,
+  MyId,
 }: {
   MessageData: MessageType;
-  Session: Session | null;
+  MyId: string;
 }) {
   const [mine, setmine] = useState(false);
   useEffect(() => {
-    const mine = Session?.user?.id === MessageData.from;
+    const mine = MyId === MessageData.from;
     setmine(mine);
     console.log(mine);
-  }, [Session]);
+  }, [MyId]);
   const time = new Date(MessageData.createdAt).toLocaleTimeString([], {
     hour: "2-digit",
     minute: "2-digit",

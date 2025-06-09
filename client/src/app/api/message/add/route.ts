@@ -1,15 +1,13 @@
-import { auth } from "@/auth";
+import { getUser } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
-import { MessageType } from "@/types";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
-  const { content, contentType, roomId, to }: MessageType = await req.json();
+  const { content, contentType, roomId, toId }: any = await req.json();
 
-  console.log(content, contentType, roomId, to);
-
-  const session = await auth();
-  if (!session) {
+  console.log(content, contentType, roomId, toId);
+  const user = await getUser();
+  if (!user) {
     return NextResponse.json({ message: `Not authenticated` }, { status: 401 });
   }
   let message;
@@ -18,9 +16,11 @@ export async function POST(req: NextRequest) {
       data: {
         content,
         contentType,
-        roomId,
-        to,
-        from: String(   session?.user?.id ?? ""),
+        room: {
+          connect: { id: roomId },
+        },
+        to: { connect: { id: toId } },
+        from: { connect: { id: user.id } },
       },
     });
     console.log(message);

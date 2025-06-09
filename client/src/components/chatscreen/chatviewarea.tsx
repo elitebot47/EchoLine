@@ -1,22 +1,22 @@
 "use client";
 import { animateScroll as scroll } from "react-scroll";
-import { MessageType, RoomType } from "@/types";
-import { Session } from "next-auth";
 import Message from "./message";
 import { AnimatePresence, easeOut, motion } from "motion/react";
 import { useSocketStore } from "@/stores/SocketStore";
 import { useEffect, useRef } from "react";
 import { useMessagesStore } from "@/stores/MessagesStore";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/router";
 
 export default function ChatViewArea({
-  Session,
   Messages,
   RoomData,
 }: {
-  Session: Session | null;
-  Messages: MessageType[] | null;
-  RoomData: RoomType | null;
+  Messages: any;
+  RoomData: any;
 }) {
+  const { data: session } = useSession();
+
   const socket = useSocketStore((state) => state.socket);
   const messages = useMessagesStore((state) => state.messages);
   const addMessage = useMessagesStore((state) => state.addMessage);
@@ -79,7 +79,7 @@ export default function ChatViewArea({
           <AnimatePresence>
             {messages?.map((message) => (
               <motion.div key={message.id}>
-                <Message MessageData={message} Session={Session} />
+                <Message MessageData={message} MyId={session?.user?.id || ""} />
               </motion.div>
             ))}
           </AnimatePresence>

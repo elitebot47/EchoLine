@@ -1,5 +1,14 @@
 "use client";
 import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -8,7 +17,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ArrowLeft, MenuIcon, Plus, PlusIcon } from "lucide-react";
-import { Session } from "next-auth";
 import { signOut } from "next-auth/react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -17,24 +25,29 @@ import { Button } from "../ui/button";
 import { AnimatePresence, motion } from "framer-motion";
 import { UserType } from "@/types";
 import UserCard from "./usercard";
+import SettingPage from "@/app/settings/page";
 
 export default function AccessibilityCard({
-  Session,
+  user,
   users,
 }: {
-  Session: Session | null;
-  users: UserType[];
+  user: any;
+  users: any;
 }) {
+  console.log("users from assec card:");
+
   const [inputtext, setInputtext] = useState("");
-  const UsersRef = useRef(users.filter((user) => user.id != Session?.user?.id));
+  const UsersRef = useRef(users.filter((User: any) => User.id != user.id));
   const [SearchedUsers, setSearchedUsers] = useState<UserType[]>([]);
   const [Searchpanel, setSearchpanel] = useState(false);
+  const [settingpage, setSettingpage] = useState(false);
 
   useEffect(() => {
     if (!inputtext.trim()) {
       setSearchedUsers([]);
       return;
     }
+    const timout = 400;
     let searchtimeout;
     if (searchtimeout) {
       clearTimeout(searchtimeout);
@@ -45,7 +58,7 @@ export default function AccessibilityCard({
           user.name.toLowerCase().includes(inputtext.toLowerCase())
         )
       );
-    }, 700);
+    }, timout);
 
     return () => {
       clearTimeout(searchtimeout);
@@ -68,21 +81,43 @@ export default function AccessibilityCard({
                 <MenuIcon className="hover:scale-110 duration-500" size={35} />
               </DropdownMenuTrigger>
               <DropdownMenuContent>
-                <DropdownMenuLabel>{Session?.user?.name}</DropdownMenuLabel>
+                <DropdownMenuLabel>{user.name}</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>Profile</DropdownMenuItem>
                 <DropdownMenuItem>Saved Chats</DropdownMenuItem>
                 <DropdownMenuItem>Settings</DropdownMenuItem>
 
-                <DropdownMenuItem
-                  onClick={() => {
-                    signOut({ callbackUrl: "/signin" });
-                    toast.info("Logging out...");
-                  }}
-                  className={` hover:!bg-red-500 hover:!text-white text-red-500`}
-                >
-                  Logout
-                </DropdownMenuItem>
+                <Dialog>
+                  <DialogTrigger className="w-full">
+                    <DropdownMenuItem
+                      onSelect={(e) => e.preventDefault()}
+                      className={` hover:!bg-red-500 hover:!text-white text-red-500`}
+                    >
+                      Logout
+                    </DropdownMenuItem>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Are you absolutely sure?</DialogTitle>
+                      <DialogDescription>
+                        This will log you out of your account.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="flex justify-end gap-2 mt-4">
+                      <DialogClose asChild>
+                        <Button>cancel</Button>
+                      </DialogClose>
+                      <Button
+                        variant="destructive"
+                        onClick={() => {
+                          signOut({ callbackUrl: "/signin" });
+                          toast.info("Logging out...");
+                        }}
+                      >
+                        Logout
+                      </Button>
+                    </div>
+                  </DialogContent>
+                </Dialog>
               </DropdownMenuContent>
             </DropdownMenu>
           </motion.div>
@@ -106,11 +141,7 @@ export default function AccessibilityCard({
           </motion.div>
         )}
       </AnimatePresence>
-      <motion.div
-        layout
-        transition={{ duration: 0.5 }}
-        className={`w-full px-3 `}
-      >
+      <motion.div transition={{ duration: 0.5 }} className={`w-full px-3 `}>
         <Input
           onChange={(e) => setInputtext(e.target.value)}
           onClick={() => {
@@ -127,13 +158,27 @@ export default function AccessibilityCard({
             initial={{ opacity: 0.5 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="h-[93vh] origin-left absolute left-0 top-full  w-full  bg-white shadow-lg border z-10"
+            className="overflow-hidden h-[93vh] origin-left absolute left-0 top-full  w-full  bg-white shadow-lg border z-10"
           >
-            <div className="">
-              {SearchedUsers.map((user) => (
-                <UserCard key={user.id} user={user} />
-              ))}
-            </div>
+            {SearchedUsers.length === 0 && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5 }}
+                className="text-center  "
+              >
+                {!inputtext ? "Search people here😊" : "No users found"}
+              </motion.div>
+            )}
+            {SearchedUsers.map((user) => (
+              <motion.div
+                key={user.id}
+                initial={{ opacity: 0, y: -40 }}
+                animate={{ opacity: 1, y: 0 }}
+              >
+                <UserCard user={user} />
+              </motion.div>
+            ))}
           </motion.div>
         )}
       </AnimatePresence>

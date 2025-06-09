@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Spinner from "@/components/ui/spinner";
 import axios from "axios";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -12,7 +13,7 @@ export default function SignUpPage() {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [loader, setLoader] = useState(false);
-
+  const router = useRouter();
   async function HandleSignup() {
     setLoader(true);
     if (!email || !password || !name) {
@@ -26,16 +27,20 @@ export default function SignUpPage() {
         password: password.trim(),
         name: name.trim(),
       });
-      console.log(`response form signup route:${res.data}`);
+      console.log(`response form signup route:${res.data.message}`);
 
       toast.success(res.data.message);
-      setLoader(false);
-    } catch (error) {
-      console.log(`${error}`);
 
-      toast.error(`${error}`);
       setLoader(false);
-      return;
+      router.push("/signin");
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        toast.error("User already exists!,try logging in.");
+      } else {
+        toast.error("Network error. Check your connection.");
+      }
+    } finally {
+      setLoader(false);
     }
   }
   return (

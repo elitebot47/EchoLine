@@ -1,11 +1,12 @@
+import { HashPassword } from "@/lib/hash";
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
   const { email, password, name } = await req.json();
-  console.log(`${email}${password}${name}`);
-
-  if (!email || !password || !name) {
+  const normalizedEmail = email.trim().toLowerCase();
+  if (!normalizedEmail || !password || !name) {
     return NextResponse.json(
       {
         message: "All 3 fields are required!",
@@ -15,30 +16,46 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const existingUser = await prisma.user.findUnique({ where: { email } });
-    console.log("existingUser", existingUser);
+    const existingUser = await prisma.user.findUnique({
+      where: { email: normalizedEmail },
+      select: { id: true },
+    });
 
     if (existingUser)
       return NextResponse.json(
-        { message: "User already exists!" },
+        { message: "User already exists!,try logging in." },
         { status: 409 }
       );
-
+    const hashedPassword = await HashPassword(password);
     await prisma.user.create({
       data: {
-        email,
-        password,
+        email: normalizedEmail,
+        password: hashedPassword,
         name,
       },
     });
-    console.log("User created in db");
 
     return NextResponse.json({ message: "Registration successfull✅" });
   } catch (error) {
-    console.log(`error:${error}`);
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      if (error.code === "P2002") {
+        console.log(error.code);
+
+        return NextResponse.json(
+          {
+            error: "AccountConflict",
+            message: "User already exists!,try logging in.",
+          },
+          { status: 409 }
+        );
+      }
+    }
 
     return NextResponse.json(
-      { message: "Internal Server Error" },
+      {
+        message: "Registration failed. Please try again later.",
+        error: "InternalError",
+      },
       { status: 500 }
     );
   }

@@ -1,6 +1,6 @@
-import { auth } from "@/auth";
 import ChatViewArea from "@/components/chatscreen/chatviewarea";
 import MessageInputCard from "@/components/chatscreen/messageinputcard";
+import { getUser } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
 
 export default async function ChatViewPage({
@@ -8,67 +8,85 @@ export default async function ChatViewPage({
 }: {
   params: Promise<{ userid: string }>;
 }) {
-  const session = await auth();
   const { userid } = await params;
-  const myId = session?.user?.id;
+  const User = await getUser();
+  if (!User?.id) {
+    return <div>Not authorised, Login first</div>;
+  }
+  const myId = User.id;
   if (userid === myId) {
     return <div>Chat Unavailable , you cant message yourself</div>;
   }
   let room;
   let userdata;
   try {
-    userdata = await prisma.user.findUnique({
-      where: {
-        id: userid,
-      },
-      select: {
-        name: true,
-      },
-    });
-    if (!userdata) {
-      return <div>User doesnt exists!!</div>;
-    }
     room = await prisma.room.findFirst({
       where: {
+        type: "private",
         participants: {
-          hasEvery: [`${userid}`, `${myId}`],
+          every: {
+            userId: { in: [myId, userid] },
+          },
         },
+      },
+      select: {
+        participants: {
+          select: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+          },
+        },
+        messages: true,
+        id: true,
       },
     });
     if (!room) {
       room = await prisma.room.create({
         data: {
           type: "private",
-          participants: [`${userid}`, `${myId}`],
+          participants: { create: [{ userId: myId }, { userId: userid }] },
+        },
+        select: {
+          participants: {
+            select: {
+              user: {
+                select: {
+                  id: true,
+                  name: true,
+                },
+              },
+            },
+          },
+          messages: true,
+          id: true,
         },
       });
     }
-  } catch (error) {}
-  const messages = room
-    ? await prisma.message.findMany({
-        where: { roomId: room.id },
-      })
-    : [];
+  } catch (error) {
+    return <div>{`Unexpected Error occured: ${error}`}</div>;
+  }
+
   return (
     <div className="flex-col   flex h-screen w-full relative">
-      <div className=" h-14 text-white backdrop-blur-md bg-black/80 z-10 w-full absolute flex gap-9">
-        <div>{userid}</div>
-        <div className="border-2">{userdata?.name}</div>
+      <div className=" h-14 text-white backdrop-blur-md  items-center bg-black/80 z-10 w-full absolute flex gap-9">
+        <div className="border-2">
+          {room?.participants
+            .filter((user) => user.user.id !== User.id)
+            .map((userinfo) => (
+              <div key={userinfo.user.id}>{userinfo.user.name}</div>
+            ))}
+        </div>
       </div>
       <div className="h-full   w-full overflow-auto">
-        <ChatViewArea
-          Session={session}
-          Messages={messages}
-          RoomData={room || null}
-        />
+        <ChatViewArea Messages={room?.messages} RoomData={room} />
       </div>
 
       <div className="w-full h-14  z-10 absolute backdrop-blur-md bg-black/80  bottom-0 ">
-        <MessageInputCard
-          Session={session}
-          Messages={messages}
-          RoomData={room || null}
-        />
+        <MessageInputCard RoomData={room} />
       </div>
     </div>
   );

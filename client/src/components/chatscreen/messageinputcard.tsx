@@ -5,22 +5,16 @@ import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { useSocketStore } from "@/stores/SocketStore";
 import { useEffect, useState } from "react";
-import { Session } from "next-auth";
-import { MessageType, RoomType } from "@/types";
 import { useMessagesStore } from "@/stores/MessagesStore";
 import axios from "axios";
 import { toast } from "sonner";
 import { AnimatePresence, motion } from "framer-motion";
+import { useSession } from "next-auth/react";
 
-export default function MessageInputCard({
-  Session,
-  Messages,
-  RoomData,
-}: {
-  Session: Session | null;
-  Messages: MessageType[] | null;
-  RoomData: RoomType | null;
-}) {
+export default function MessageInputCard({ RoomData }: { RoomData: any }) {
+  const { data: session } = useSession();
+  console.log("RoomData", RoomData);
+
   const socket = useSocketStore((state) => state.socket);
   const addMessage = useMessagesStore((state) => state.addMessage);
   const [chattext, setchattext] = useState("");
@@ -52,12 +46,12 @@ export default function MessageInputCard({
     }
     try {
       const res = await axios.post("/api/message/add", {
-        content: chattext,
+        content: String(chattext),
         contentType: "text",
-        roomId: RoomData?.id,
-        to: RoomData?.participants.filter(
-          (user) => user !== Session?.user?.id
-        )[0],
+        roomId: String(RoomData?.id),
+        toId: RoomData?.participants.filter(
+          (user) => user.user.id !== session?.user?.id
+        )[0].user.id,
       });
       if (res.data.message) {
         addMessage(res.data);
