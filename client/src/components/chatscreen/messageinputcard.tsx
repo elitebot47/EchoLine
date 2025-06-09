@@ -17,6 +17,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { MessageCreateInput } from "@/lib/schemas/message";
 type MinimalParticipant = { user: { id: string; name: string } };
 
 type MessageInputCardProps = {
@@ -59,10 +60,15 @@ export default function MessageInputCard({
     if (!chattext) {
       return;
     }
-    const links = find(`${chattext}`);
+
+    const links = find(chattext.trim());
 
     const detectedContentType =
-      links.length > 0 && links[0].type === "url" ? "link" : "text";
+      links.length > 0 &&
+      links[0].type === "url" &&
+      links[0].value == chattext.trim()
+        ? "link"
+        : "text";
 
     try {
       const recipient = participants.find(
@@ -77,7 +83,7 @@ export default function MessageInputCard({
         contentType: String(detectedContentType),
         roomId: String(id),
         toId: String(recipient.user.id),
-      });
+      } as MessageCreateInput);
 
       if (res.data.message) {
         addMessage(res.data);

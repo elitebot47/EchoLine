@@ -19,7 +19,7 @@ export default function ResponsiveChatLayout({
       <section
         className={`
           ${showChat ? "hidden" : "block"} 
-          lg:block w-full lg:w-1/3 h-full border-b-2 lg:border-b-0 lg:border-r-2
+          lg:block w-full lg:w-1/3 h-full  
         `}
       >
         <AccessibilityCard users={users} />
