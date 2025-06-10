@@ -18,6 +18,8 @@ export type MinimalMessage = Pick<
   | "contentType"
   | "updatedAt"
 >;
+export type StatusType = "SENDING" | "SENT" | "DELIVERED" | "READ";
+
 export type MessageType = {
   id: string;
   from: string;
@@ -30,6 +32,7 @@ export type MessageType = {
   contentType: "text" | "image" | "video" | "link";
   updatedAt: Date;
   roomId: string;
+  status: StatusType;
 };
 
 export type RoomParticipantType = {

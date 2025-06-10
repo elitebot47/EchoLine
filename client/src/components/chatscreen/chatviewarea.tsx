@@ -1,12 +1,12 @@
 "use client";
+import { useMessagesStore } from "@/stores/MessagesStore";
+import { useSocketStore } from "@/stores/SocketStore";
+import type { MinimalMessage } from "@/types";
+import { AnimatePresence, motion } from "motion/react";
+import { useSession } from "next-auth/react";
+import { useEffect, useRef } from "react";
 import { animateScroll as scroll } from "react-scroll";
 import Message from "./message";
-import { AnimatePresence, easeOut, motion } from "motion/react";
-import { useSocketStore } from "@/stores/SocketStore";
-import { useEffect, useRef } from "react";
-import { useMessagesStore } from "@/stores/MessagesStore";
-import { useSession } from "next-auth/react";
-import { MinimalMessage } from "@/types";
 
 export default function ChatViewArea({
   Messages,
@@ -16,13 +16,11 @@ export default function ChatViewArea({
   roomId: string;
 }) {
   const { data: session } = useSession();
-
   const socket = useSocketStore((state) => state.socket);
   const messages = useMessagesStore((state) => state.messages);
   const addMessage = useMessagesStore((state) => state.addMessage);
   const setMessages = useMessagesStore((state) => state.setMessages);
   const chatContainerRef = useRef<HTMLDivElement>(null);
-
   useEffect(() => {
     setMessages(Messages?.filter(Boolean) ?? []);
   }, [Messages, setMessages]);

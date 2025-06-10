@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Spinner from "@/components/ui/spinner";
 import axios from "axios";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -74,6 +75,7 @@ export default function SignUpPage() {
           {loader ? <Spinner /> : "Signup"}
         </Button>
       </div>
+      <Link href={"/signin"}>Signup here</Link>
     </div>
   );
 }

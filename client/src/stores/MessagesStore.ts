@@ -1,4 +1,4 @@
-import { MessageType, MinimalMessage } from "@/types";
+import type { MinimalMessage } from "@/types";
 import { create } from "zustand";
 
 type MessagesStoreType = {

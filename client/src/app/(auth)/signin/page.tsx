@@ -2,6 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { signIn } from "next-auth/react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -69,6 +70,7 @@ export default function SignInPage() {
           Sign in
         </Button>
       </div>
+      <Link href={"/signup"}>Signup here</Link>
     </div>
   );
 }

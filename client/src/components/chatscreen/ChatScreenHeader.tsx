@@ -1,10 +1,10 @@
 "use client";
 
 import { useShowChatStore } from "@/stores/showChatStore";
+import type { MinimalUser } from "@/types";
+import { ArrowLeft } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { Button } from "../ui/button";
-import { ArrowLeft } from "lucide-react";
-import { MinimalUser } from "@/types";
 
 export default function ChatScreenHeader({ users }: { users: MinimalUser[] }) {
   const { data: session } = useSession();

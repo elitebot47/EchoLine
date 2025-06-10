@@ -3,7 +3,7 @@
 import AccessibilityCard from "@/components/chatscreen/accessibilitycard";
 import UserList from "@/components/chatscreen/userlist";
 import { useShowChatStore } from "@/stores/showChatStore";
-import { MinimalUser, UserType } from "@/types";
+import type { MinimalUser } from "@/types";
 
 export default function ResponsiveChatLayout({
   users,
@@ -17,7 +17,7 @@ export default function ResponsiveChatLayout({
   return (
     <main className="flex flex-col lg:flex-row h-screen">
       <section
-        className={`
+        className={` border-r-2
           ${showChat ? "hidden" : "block"} 
           lg:block w-full lg:w-1/3 h-full  
         `}

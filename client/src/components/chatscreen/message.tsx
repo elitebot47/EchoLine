@@ -1,6 +1,7 @@
 "use client";
-import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import { MessageStatus } from "../message/messageStatus";
 
 export default function Message({
   MessageData,
@@ -47,12 +48,17 @@ export default function Message({
           <div>{MessageData.content}</div>
         )}
       </div>
-      <div
-        className={`${
-          mine ? "self-end" : "self-start"
-        }  font-light text-xs text-[10px]`}
-      >
-        {time}
+      <div className="self-end flex items-center">
+        <div
+          className={`
+             "self-end" 
+            font-light text-xs text-[10px]`}
+        >
+          {time}
+        </div>
+        <div>
+          <MessageStatus status={`SENT`}></MessageStatus>
+        </div>
       </div>
     </motion.div>
   );

@@ -16,16 +16,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import type { MinimalUser } from "@/types";
+import { AnimatePresence, motion } from "framer-motion";
 import { ArrowLeft, MenuIcon } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import { AnimatePresence, motion } from "framer-motion";
-import { MinimalUser, UserType } from "@/types";
+import { Input } from "../ui/input";
 import UserCard from "./usercard";
-import SettingPage from "@/app/settings/page";
 
 export default function AccessibilityCard({ users }: { users: MinimalUser[] }) {
   const { data: session } = useSession();
@@ -39,7 +38,7 @@ export default function AccessibilityCard({ users }: { users: MinimalUser[] }) {
   );
   const [SearchedUsers, setSearchedUsers] = useState<MinimalUser[]>([]);
   const [Searchpanel, setSearchpanel] = useState(false);
-  const [settingpage, setSettingpage] = useState(false);
+  // const [settingpage, setSettingpage] = useState(false);
 
   useEffect(() => {
     if (!inputtext.trim()) {
@@ -170,11 +169,7 @@ export default function AccessibilityCard({ users }: { users: MinimalUser[] }) {
               </motion.div>
             )}
             {SearchedUsers.map((user) => (
-              <motion.div
-                key={user.id}
-                initial={{ opacity: 0, y: -40 }}
-                animate={{ opacity: 1, y: 0 }}
-              >
+              <motion.div key={user.id}>
                 <UserCard user={user} />
               </motion.div>
             ))}

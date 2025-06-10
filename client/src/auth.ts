@@ -1,8 +1,8 @@
 import NextAuth from "next-auth";
+import type { JWT } from "next-auth/jwt";
 import Credentials from "next-auth/providers/credentials";
-import { prisma } from "./lib/prisma";
-import { JWT } from "next-auth/jwt";
 import { VerifyPassword } from "./lib/hash";
+import { prisma } from "./lib/prisma";
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
     Credentials({

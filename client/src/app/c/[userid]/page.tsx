@@ -3,7 +3,7 @@ import ChatViewArea from "@/components/chatscreen/chatviewarea";
 import MessageInputCard from "@/components/chatscreen/messageinputcard";
 import { getUser } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
-import { MinimalMessage } from "@/types";
+import type { MinimalMessage } from "@/types";
 
 export default async function ChatViewPage({
   params,

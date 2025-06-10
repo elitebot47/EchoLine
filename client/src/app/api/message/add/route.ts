@@ -16,6 +16,12 @@ export async function POST(req: NextRequest) {
     );
   }
   try {
+    const existingMesages = await prisma.message.count({
+      where: {
+        roomId: result.data.roomId,
+      },
+    });
+    const isFirstMessage = existingMesages === 0;
     const message = await prisma.message.create({
       data: {
         ...result.data,
@@ -31,7 +37,17 @@ export async function POST(req: NextRequest) {
         contentType: true,
       },
     });
-    return NextResponse.json({ message });
+    console.log("isFirstMessage", isFirstMessage);
+
+    return NextResponse.json({
+      message,
+      isFirstMessage,
+      user: {
+        id: session.user.id,
+        roomId: result.data.roomId,
+        name: session.user.name,
+      },
+    });
   } catch (error) {
     return NextResponse.json({ message: `error:${error}` }, { status: 501 });
   }

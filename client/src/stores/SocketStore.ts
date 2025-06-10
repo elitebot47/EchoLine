@@ -5,7 +5,7 @@ type SocketStoreType = {
   socket: Socket | null;
   initializesocket: () => void;
 };
-const port = 4000;
+const port = 3001;
 export const useSocketStore = create<SocketStoreType>((set) => ({
   socket: null,
   initializesocket: () => {

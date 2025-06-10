@@ -1,23 +1,24 @@
 "use client";
 
-import { LucidePaperclip, SendHorizontalIcon } from "lucide-react";
-import { Button } from "../ui/button";
-import { Input } from "../ui/input";
-import { useSocketStore } from "@/stores/SocketStore";
-import { useEffect, useState } from "react";
-import { useMessagesStore } from "@/stores/MessagesStore";
-import axios from "axios";
-import { toast } from "sonner";
-import { AnimatePresence, motion } from "framer-motion";
-import { useSession } from "next-auth/react";
-import { find } from "linkifyjs";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MessageCreateInput } from "@/lib/schemas/message";
+import type { MessageCreateInput } from "@/lib/schemas/message";
+import { useMessagesStore } from "@/stores/MessagesStore";
+import { useSocketStore } from "@/stores/SocketStore";
+import { useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
+import { AnimatePresence, motion } from "framer-motion";
+import { find } from "linkifyjs";
+import { LucidePaperclip, SendHorizontalIcon } from "lucide-react";
+import { useSession } from "next-auth/react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
 type MinimalParticipant = { user: { id: string; name: string } };
 
 type MessageInputCardProps = {
@@ -31,6 +32,8 @@ export default function MessageInputCard({
   const { data: session } = useSession();
 
   const socket = useSocketStore((state) => state.socket);
+  const queryClient = useQueryClient();
+
   const addMessage = useMessagesStore((state) => state.addMessage);
   const [chattext, setchattext] = useState("");
   const [Typingstatus, setTypingstatus] = useState(false);
@@ -87,6 +90,13 @@ export default function MessageInputCard({
 
       if (res.data.message) {
         addMessage(res.data);
+      }
+      if (res.data.isFirstMessage) {
+        queryClient.invalidateQueries({
+          queryKey: ["known-users"],
+
+          refetchType: "active",
+        });
       }
 
       socket?.emit("Chat_client", res.data);

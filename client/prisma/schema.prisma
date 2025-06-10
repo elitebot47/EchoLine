@@ -55,11 +55,20 @@ model Message {
   updatedAt   DateTime    @updatedAt
   room        Room        @relation(fields: [roomId], references: [id])
   roomId      String      @db.Uuid
+  status      StatusType  @default(SENT)
 
   @@index([roomId, createdAt(sort: Desc)])
   @@index([fromId, createdAt(sort: Desc)])
   @@index([roomId, fromId])
   @@index([createdAt(sort: Desc)])
+  @@index([status, createdAt])
+}
+
+enum StatusType {
+  SENDING
+  SENT
+  DELIVERED
+  READ
 }
 
 enum RoomType {
