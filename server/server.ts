@@ -25,12 +25,12 @@ io.on("connection", (socket) => {
     console.log("joinRoom", data);
     socket.join(data);
   });
+
   socket.on("leaveRoom", (data) => {
     console.log("joinRoom", data);
     socket.leave(data);
   });
 });
-
 server.listen(port, address, () => {
-  console.log(`server listenting on ${port}`);
+  console.log(`server listening on ${port}`);
 });

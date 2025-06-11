@@ -10,7 +10,7 @@ export default async function ChatViewPage({
 }: {
   params: Promise<{ userid: string }>;
 }) {
-  const { userid } = await params;
+  const { userid } = await  params;
   const User = await getUser();
   if (!User?.id) {
     return <div>Not authorised, Login first</div>;
@@ -60,6 +60,7 @@ export default async function ChatViewPage({
       },
     });
     if (!room) {
+
       room = await prisma.room.create({
         data: {
           type: "private",
@@ -109,6 +110,7 @@ export default async function ChatViewPage({
       </div>
       <div className="flex-1 w-full overflow-auto">
         <ChatViewArea
+        
           Messages={
             room?.messages.filter(
               (msg) => msg.toId !== null
