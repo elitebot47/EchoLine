@@ -1,11 +1,5 @@
 "use client";
 
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import type { MessageCreateInput } from "@/lib/schemas/message";
 import { useMessagesStore } from "@/stores/MessagesStore";
 import { useSocketStore } from "@/stores/SocketStore";
@@ -13,12 +7,14 @@ import { useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { AnimatePresence, motion } from "framer-motion";
 import { find } from "linkifyjs";
-import { LucidePaperclip, SendHorizontalIcon } from "lucide-react";
+import { LucidePaperclip, Plus, SendHorizontalIcon } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import MyDropzone from "../MyDropzone";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
+
 type MinimalParticipant = { user: { id: string; name: string } };
 
 type MessageInputCardProps = {
@@ -37,7 +33,7 @@ export default function MessageInputCard({
   const addMessage = useMessagesStore((state) => state.addMessage);
   const [chattext, setchattext] = useState("");
   const [Typingstatus, setTypingstatus] = useState(false);
-  // const [contentType, setContentType] = useState("");
+  const [uploadbox, setUploadbox] = useState(false);
   useEffect(() => {
     if (!socket || !id) return;
 
@@ -58,6 +54,9 @@ export default function MessageInputCard({
     };
   }, [socket, id]);
 
+  const recipient = participants.find(
+    (user) => user.user.id !== session?.user?.id
+  );
   async function HandleSend() {
     setTypingstatus(false);
     if (!chattext) {
@@ -74,9 +73,6 @@ export default function MessageInputCard({
         : "text";
 
     try {
-      const recipient = participants.find(
-        (user) => user.user.id !== session?.user?.id
-      );
       if (!recipient) {
         toast.error("Error:Connection error ,please try again later");
         return;
@@ -105,6 +101,7 @@ export default function MessageInputCard({
       toast.error(`error:Failed to send message`);
     }
   }
+
   return (
     <div className="flex w-full gap-2 justify-center items-center relative p-2 h-full">
       <AnimatePresence>
@@ -123,6 +120,7 @@ export default function MessageInputCard({
         )}
       </AnimatePresence>
       <Input
+        disabled={uploadbox}
         className=" rounded-full lg:rounded-lg  h-full w-full lg:!text-xl !text-2xl
          focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus:border-0 focus:outline-none hover:ring-0 ring-0 border-0  text-white"
         value={chattext}
@@ -134,22 +132,44 @@ export default function MessageInputCard({
         }}
         onKeyDown={(e) => e.key === "Enter" && HandleSend()}
       />
-
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            size={"icon"}
-            className="lg:w-16 lg:h-10 w-14 h-12  cursor-pointer"
-          >
-            <LucidePaperclip />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent className="mb-1">
-          <DropdownMenuItem>Images</DropdownMenuItem>
-          <DropdownMenuItem>Document</DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
       <Button
+        onClick={() => setUploadbox(true)}
+        size={"icon"}
+        className="lg:w-16 lg:h-10 w-14 h-12  cursor-pointer"
+      >
+        <LucidePaperclip />
+      </Button>
+      <AnimatePresence>
+        {uploadbox && (
+          <motion.div
+            key="upload-box"
+            initial={{ y: 50 }}
+            animate={{ y: 0 }}
+            exit={{ y: 50, opacity: 0 }}
+            className={`absolute  flex flex-col  gap-2 bottom-full shadow-2xl z-50 shadow-black/50 bg-black/50 backdrop-blur-xl  p-2 rounded-4xl`}
+          >
+            <div className="flex justify-end mr-2">
+              <Button
+                onClick={() => {
+                  setUploadbox(false);
+                }}
+                className="rounded-full bg-black/50 backdrop-blur-lg cursor-pointer w-12 h-9"
+              >
+                <Plus className="rotate-45 scale-125" />
+              </Button>
+            </div>
+            <div>
+              <MyDropzone
+                roomId={String(id)}
+                toId={String(recipient?.user.id)}
+                setUploadbox={setUploadbox}
+              />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      <Button
+        hidden={uploadbox}
         className={`w-14 lg:w-16 lg:h-10 h-12  cursor-pointer`}
         disabled={chattext.length === 0}
         onClick={HandleSend}

@@ -9,7 +9,9 @@ const port = 3001;
 export const useSocketStore = create<SocketStoreType>((set) => ({
   socket: null,
   initializesocket: () => {
-    const socketinstance = io(`192.168.1.3:${port}`);
+    const socketinstance = io("http://192.168.1.5:3001", {
+      transports: ["websocket"],
+    });
     set({ socket: socketinstance });
   },
 }));

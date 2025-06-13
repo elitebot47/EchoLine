@@ -2,6 +2,7 @@
 import { useMessagesStore } from "@/stores/MessagesStore";
 import { useSocketStore } from "@/stores/SocketStore";
 import type { MinimalMessage } from "@/types";
+import type { UUID } from "crypto";
 import { AnimatePresence, motion } from "motion/react";
 import { useSession } from "next-auth/react";
 import { useEffect, useRef } from "react";
@@ -20,6 +21,7 @@ export default function ChatViewArea({
   const messages = useMessagesStore((state) => state.messages);
   const addMessage = useMessagesStore((state) => state.addMessage);
   const setMessages = useMessagesStore((state) => state.setMessages);
+  const deletedMessage = useMessagesStore((state) => state.deletedMessage);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     setMessages(Messages?.filter(Boolean) ?? []);
@@ -45,7 +47,18 @@ export default function ChatViewArea({
       socket.off("BroadToMembers", handler);
     };
   }, [socket, addMessage]);
-
+  useEffect(() => {
+    if (!socket) return;
+    const handler = (data: { id: UUID; roomId: UUID }) => {
+      if (data.id) {
+        deletedMessage(data.id);
+      }
+    };
+    socket.on("delete-message-action", handler);
+    return () => {
+      socket.off("delete-message-action", handler);
+    };
+  }, [socket, deletedMessage]);
   useEffect(() => {
     scroll.scrollToBottom({
       containerId: "chat-container",
@@ -60,9 +73,7 @@ export default function ChatViewArea({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ ease: "easeInOut", duration: 0.7 }}
-        className={`origin-left ${
-          messages?.length === 0 ? "bg-green-500/50" : "bg-gray-500/50"
-        } h-full  w-full`}
+        className="origin-left h-full w-full"
       >
         <div
           id="chat-container"
@@ -75,11 +86,24 @@ export default function ChatViewArea({
             </div>
           )}
           <AnimatePresence>
-            {messages?.map((message) => (
-              <motion.div key={message.id}>
-                <Message MessageData={message} MyId={session?.user?.id || ""} />
-              </motion.div>
-            ))}
+            {messages
+              ?.filter(
+                (message) => message?.content && message.content.trim() !== ""
+              )
+              .map((message, index) => {
+                const key = message.id
+                  ? message.id
+                  : `${message.createdAt}-${index}`;
+
+                return (
+                  <motion.div key={key}>
+                    <Message
+                      MessageData={message}
+                      MyId={session?.user?.id || ""}
+                    />
+                  </motion.div>
+                );
+              })}
           </AnimatePresence>
         </div>
       </motion.div>

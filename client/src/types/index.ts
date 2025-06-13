@@ -25,11 +25,14 @@ export type MessageType = {
   from: string;
   to: string;
   toId: string;
+  fileName?: string;
+  fileSize?: number;
+  fileType?: string;
   fromId: string;
   room: RoomType;
   createdAt: Date;
   content: string;
-  contentType: "text" | "image" | "video" | "link";
+  contentType: "text" | "image" | "video" | "link" | "document";
   updatedAt: Date;
   roomId: string;
   status: StatusType;

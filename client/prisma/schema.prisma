@@ -49,6 +49,9 @@ model Message {
   fromId      String      @db.Uuid
   to          User        @relation("MessagesTo", fields: [toId], references: [id])
   toId        String      @db.Uuid
+  fileName    String?
+  fileSize    Int?
+  fileType    String?
   createdAt   DateTime    @default(now())
   content     String
   contentType ContentType
@@ -81,4 +84,5 @@ enum ContentType {
   image
   video
   link
+  document
 }

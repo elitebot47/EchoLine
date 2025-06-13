@@ -10,7 +10,7 @@ export default async function ChatViewPage({
 }: {
   params: Promise<{ userid: string }>;
 }) {
-  const { userid } = await  params;
+  const { userid } = await params;
   const User = await getUser();
   if (!User?.id) {
     return <div>Not authorised, Login first</div>;
@@ -60,7 +60,6 @@ export default async function ChatViewPage({
       },
     });
     if (!room) {
-
       room = await prisma.room.create({
         data: {
           type: "private",
@@ -108,9 +107,8 @@ export default async function ChatViewPage({
       <div className="h-14 text-white backdrop-blur-md items-center bg-black/70 z-10 w-full flex gap-9">
         <ChatScreenHeader users={room.participants.map((p) => p.user)} />
       </div>
-      <div className="flex-1 w-full overflow-auto">
+      <div className="flex-1 w-full z-0 overflow-auto">
         <ChatViewArea
-        
           Messages={
             room?.messages.filter(
               (msg) => msg.toId !== null
@@ -119,7 +117,7 @@ export default async function ChatViewPage({
           roomId={room.id}
         />
       </div>
-      <div className="w-full lg:h-14 h-16 z-10 backdrop-blur-md bg-black/70">
+      <div className="w-full lg:h-14 h-16 z-20  bg-black/70">
         <MessageInputCard id={room.id} participants={room.participants} />
       </div>
     </div>

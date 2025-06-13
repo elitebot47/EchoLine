@@ -5,7 +5,6 @@ import { Server } from "socket.io";
 const app = express();
 const server = http.createServer(app);
 const port = 3001;
-const address = "0.0.0.0";
 const io = new Server(server, {
   cors: {
     origin: "*",
@@ -14,7 +13,9 @@ const io = new Server(server, {
 
 io.on("connection", (socket) => {
   console.log(`user connected:${socket.id}`);
-
+  socket.on("delete-message", (data) => {
+    socket.broadcast.to(data.roomId).emit("delete-message-action", data);
+  });
   socket.on("Chat_client", (data) => {
     io.to(data.message.roomId).emit("BroadToMembers", data);
   });
@@ -31,6 +32,6 @@ io.on("connection", (socket) => {
     socket.leave(data);
   });
 });
-server.listen(port, address, () => {
+server.listen(port, "0.0.0.0", () => {
   console.log(`server listening on ${port}`);
 });
