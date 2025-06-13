@@ -147,11 +147,6 @@ export default function Message({
               alt={MessageData.content || "Uploaded image"}
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 300px"
               className="rounded-lg  shadow-sm blur-xs transition-all  hover:shadow-md"
-              onError={(e) => {
-                (e.target as HTMLImageElement).onerror = null;
-                (e.target as HTMLImageElement).src =
-                  "https://via.placeholder.com/100x100?text=Error";
-              }}
             />
           ) : (
             <Dialog>

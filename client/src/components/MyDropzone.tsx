@@ -7,7 +7,7 @@ import axios from "axios";
 import { AnimatePresence, motion } from "framer-motion";
 import { Plus, SendHorizontalIcon } from "lucide-react";
 import { useSession } from "next-auth/react";
-import { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { type FileRejection, useDropzone } from "react-dropzone";
 import { toast } from "sonner";
 import { Button } from "./ui/button";
@@ -17,6 +17,8 @@ interface FileWithPreview extends File {
   preview: string;
 }
 const MyDropzone = ({
+  uploading,
+  setUploading,
   toId,
   roomId,
   setUploadbox,
@@ -24,6 +26,8 @@ const MyDropzone = ({
   toId: string;
   roomId: string;
   setUploadbox: React.Dispatch<React.SetStateAction<boolean>>;
+  setUploading: React.Dispatch<React.SetStateAction<boolean>>;
+  uploading: boolean;
 }) => {
   const { data: session } = useSession();
 
@@ -32,10 +36,13 @@ const MyDropzone = ({
   const queryClient = useQueryClient();
   const addMessage = useMessagesStore((state) => state.addMessage);
   const replaceMessage = useMessagesStore((state) => state.replaceMessage);
-  const [uploading, setUploading] = useState(false);
+  const isSendingRef = React.useRef(false);
 
   async function HandleSendFiles() {
+    if (isSendingRef.current) return;
+    isSendingRef.current = true;
     setUploading(true);
+
     if (!toId) {
       toast.error("Error:Connection error ,please try again later");
       toast.error("Error while uploading:Recipient id missing");
@@ -48,7 +55,9 @@ const MyDropzone = ({
         const formData = new FormData();
         if (!session?.user?.id) return;
 
-        console.log(file.preview);
+        if (!file.preview) {
+          return;
+        }
         let filetype;
         if (file.type.includes("image")) {
           formData.append("file", file);
@@ -66,9 +75,8 @@ const MyDropzone = ({
           updatedAt: new Date(),
           createdAt: new Date(),
         });
-        setTimeout(() => {
-          setUploadbox(false);
-        }, 500);
+
+        setUploadbox(false);
         const res1 = await axios.post(`/api/fileupload/image`, formData);
 
         const res2 = await axios.post("/api/message/add", {
@@ -93,10 +101,15 @@ const MyDropzone = ({
         socket?.emit("Chat_client", res2.data);
         setUploadedFiles([]);
       });
-      const uploads = (await Promise.all(uploadpromises)).filter(Boolean);
+      (await Promise.all(uploadpromises)).filter(Boolean);
       setUploadbox(false);
+      setUploading(false);
     } catch (error) {
       toast.error(`error:Failed to send message`);
+      setUploading(false);
+    } finally {
+      isSendingRef.current = false;
+      setUploading(false);
     }
   }
   const onDrop = useCallback(
@@ -121,7 +134,17 @@ const MyDropzone = ({
 
   useEffect(() => {
     return () => {
-      uploadedFiles.forEach((file) => URL.revokeObjectURL(file.preview));
+      console.log("Running cleanup for", uploadedFiles.length, "files"); // Log cleanup start
+      uploadedFiles.forEach((file) => {
+        const images = document.images ? Array.from(document.images) : [];
+        const stillInDOM = images.some((img) => img.src === file.preview);
+        console.log("Checking file:", file.id, "In DOM?", stillInDOM); // Log per-file check
+
+        if (!stillInDOM) {
+          console.log("Revoking URL for:", file.id); // Log before revoking
+          URL.revokeObjectURL(file.preview);
+        }
+      });
     };
   }, [uploadedFiles]);
 
@@ -148,29 +171,23 @@ const MyDropzone = ({
     ? "border-red-500"
     : "border-gray-300";
 
-  useEffect(() => {
-    return () => {
-      uploadedFiles.forEach((file) => URL.revokeObjectURL(file.preview));
-    };
-  }, [uploadedFiles]);
-
   return (
-    <AnimatePresence>
+    <AnimatePresence mode="wait">
       <div>
         <motion.div
-          layout
-          transition={{ duration: 0.3 }}
-          className="font-sans  overflow-hidden   w-[900px]   rounded-4xl"
+          layout="size"
+          transition={{ duration: 0.2 }}
+          className="font-sans     w-full max-w-[900px] min-w-[500px]  overflow-hidden   rounded-4xl"
         >
           <motion.div
             key={`upload-view-area`}
             layout
-            transition={{ duration: 0.3 }}
+            transition={{ duration: 0.2 }}
             {...getRootProps({})}
-            className={`flex flex-col items-center p-10  rounded-4xl border-dashed bg-gray-50/50 text-gray-800  outline-none transition-colors duration-200 cursor-pointer 
+            className={`flex flex-col items-center p-10  rounded-4xl border-dashed bg-gray-50/50 text-gray-800   outline-none transition-colors duration-200 cursor-pointer 
             ${dropzoneBorderColor} ${
               isDragActive
-                ? "bg-gray-900/30 border-2 border-dashed backdrop-blur-lg "
+                ? "bg-gray-900/30 border-2 w-[800px] h-[500px]  border-dashed backdrop-blur-lg "
                 : ""
             }`}
           >
@@ -220,34 +237,38 @@ const MyDropzone = ({
             <motion.div className="mt-5 ">
               <ul className="list-none  flex flex-wrap gap-4">
                 {uploadedFiles.map((file) => (
-                  <li
+                  <motion.li
+                    initial={{ opacity: 0, scale: 0.5 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.5 }}
                     key={file.id}
                     className="border border-gray-200 rounded-4xl p-1 flex h-fit  justify-center  flex-col items-center max-w-[200px] text-center bg-gray-50/50"
                   >
                     <div className="relative">
                       <Button
-                        onClick={() => {
-                          const updatedFiles = uploadedFiles.filter(
-                            (f) => f.id !== file.id
+                        className="absolute right-1 top-1 rounded-full flex justify-center items-center  cursor-pointer w-7 h-7 bg-black/70 backdrop-blur-sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const previewUrl = file.preview;
+                          setUploadedFiles((prev) =>
+                            prev.filter((f) => f.id !== file.id)
                           );
-                          setUploadedFiles(updatedFiles);
-                          URL.revokeObjectURL(file.preview);
+                          requestAnimationFrame(() => {
+                            const images = Array.from(document.images);
+                            if (!images.some((img) => img.src === previewUrl)) {
+                              URL.revokeObjectURL(previewUrl);
+                            }
+                          });
                         }}
-                        className={`top-2 right-2 backdrop-blur-md cursor-pointer bg-black/50 w-7 h-7  absolute rounded-full`}
                       >
-                        <Plus className={`rotate-45 text-white  scale-125`} />
+                        <Plus className={`rotate-45 text-white scale-125`} />
                       </Button>
                       <div>
                         {file.type.startsWith("image/") && (
                           <img
                             src={file.preview}
-                            alt={file.name}
+                            alt={file.id}
                             className=" w-auto max-h-[250px] max-w-[150px] h-fit  object-contain mb-1 rounded-4xl "
-                            onError={(e) => {
-                              (e.target as HTMLImageElement).onerror = null;
-                              (e.target as HTMLImageElement).src =
-                                "https://via.placeholder.com/100x100?text=Error";
-                            }}
                           />
                         )}
                       </div>
@@ -255,7 +276,7 @@ const MyDropzone = ({
                     <span className="text-[8px] mx-auto break-all overflow-wrap-anywhere">
                       {file.name}
                     </span>
-                  </li>
+                  </motion.li>
                 ))}
               </ul>
             </motion.div>
@@ -265,9 +286,11 @@ const MyDropzone = ({
           <motion.div className=" flex justify-end items-center mr-3 mt-2">
             <Button
               key={"sendbutton"}
-              className={` w-14 lg:w-16 lg:h-12 h-12 rounded-4xl cursor-pointer`}
+              className={`hover:scale-95 w-14 lg:w-16 lg:h-12 h-12 rounded-4xl cursor-pointer`}
               disabled={uploadedFiles.length === 0 || uploading}
-              onClick={HandleSendFiles}
+              onClick={() => {
+                HandleSendFiles();
+              }}
             >
               {<SendHorizontalIcon className={`scale-125`} />}
             </Button>

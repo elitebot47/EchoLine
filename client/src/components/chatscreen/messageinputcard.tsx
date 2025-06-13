@@ -29,6 +29,7 @@ export default function MessageInputCard({
 
   const socket = useSocketStore((state) => state.socket);
   const queryClient = useQueryClient();
+  const [uploading, setUploading] = useState<boolean>(false);
 
   const addMessage = useMessagesStore((state) => state.addMessage);
   const [chattext, setchattext] = useState("");
@@ -132,34 +133,66 @@ export default function MessageInputCard({
         }}
         onKeyDown={(e) => e.key === "Enter" && HandleSend()}
       />
-      <Button
-        onClick={() => setUploadbox(true)}
-        size={"icon"}
-        className="lg:w-16 lg:h-10 w-14 h-12  cursor-pointer"
-      >
-        <LucidePaperclip />
-      </Button>
       <AnimatePresence>
+        <motion.div key={"attach-button"}>
+          <Button
+            key={"attach-button"}
+            disabled={uploading}
+            onClick={() => setUploadbox(true)}
+            size={"icon"}
+            className="hover:scale-105 lg:w-16 lg:h-10 w-14 h-12  cursor-pointer"
+          >
+            <LucidePaperclip />
+          </Button>
+        </motion.div>
+        {!uploadbox && (
+          <motion.div
+            className=" origin-right"
+            key="send-button-container"
+            initial={{ opacity: 0, scaleX: 0.6 }}
+            animate={{
+              opacity: 1,
+              scaleX: 1,
+              transition: {
+                type: "spring",
+                stiffness: 400,
+                damping: 15,
+              },
+            }}
+            transition={{ duration: 0.2 }}
+          >
+            <Button
+              className="w-14 hover:scale-105 lg:w-16 lg:h-10 h-12 cursor-pointer"
+              disabled={chattext.length === 0}
+              onClick={HandleSend}
+            >
+              <SendHorizontalIcon />
+            </Button>
+          </motion.div>
+        )}
         {uploadbox && (
           <motion.div
             key="upload-box"
-            initial={{ y: 50 }}
-            animate={{ y: 0 }}
-            exit={{ y: 50, opacity: 0 }}
-            className={`absolute  flex flex-col  gap-2 bottom-full shadow-2xl z-50 shadow-black/50 bg-black/50 backdrop-blur-xl  p-2 rounded-4xl`}
+            layout
+            initial={{ y: 50, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 50, opacity: 0, scale: 0 }}
+            className={` origin-bottom absolute  flex flex-col  gap-2 bottom-full shadow-2xl z-50 shadow-black/50 bg-black/50 backdrop-blur-xl  p-2 rounded-4xl`}
           >
             <div className="flex justify-end mr-2">
               <Button
                 onClick={() => {
                   setUploadbox(false);
                 }}
-                className="rounded-full bg-black/50 backdrop-blur-lg cursor-pointer w-12 h-9"
+                className="rounded-full hover:scale-105 bg-black/50 backdrop-blur-lg cursor-pointer w-12 h-9"
               >
-                <Plus className="rotate-45 scale-125" />
+                <Plus className="rotate-45 size-6" />
               </Button>
             </div>
             <div>
               <MyDropzone
+                uploading={uploading}
+                setUploading={setUploading}
                 roomId={String(id)}
                 toId={String(recipient?.user.id)}
                 setUploadbox={setUploadbox}
@@ -168,14 +201,6 @@ export default function MessageInputCard({
           </motion.div>
         )}
       </AnimatePresence>
-      <Button
-        hidden={uploadbox}
-        className={`w-14 lg:w-16 lg:h-10 h-12  cursor-pointer`}
-        disabled={chattext.length === 0}
-        onClick={HandleSend}
-      >
-        <SendHorizontalIcon />
-      </Button>
     </div>
   );
 }
