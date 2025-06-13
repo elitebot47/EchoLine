@@ -12,7 +12,7 @@ import { type FileRejection, useDropzone } from "react-dropzone";
 import { toast } from "sonner";
 import { Button } from "./ui/button";
 
-interface FileWithPreview extends File {
+export interface FileWithPreview extends File {
   id: string;
   preview: string;
 }
@@ -59,9 +59,15 @@ const MyDropzone = ({
           return;
         }
         let filetype;
+
         if (file.type.includes("image")) {
+          const upload_preset = process.env.CLOUDINARY_UPLOAD_PRESET_ROOM_IMAGE;
+          if (!upload_preset) {
+            toast.error("Error: upload_preset missing!");
+            return;
+          }
           formData.append("file", file);
-          formData.append("upload_preset", "chat-app-room-image");
+          formData.append("upload_preset", upload_preset);
           filetype = "image";
         }
 

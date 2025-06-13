@@ -6,7 +6,7 @@ export type RoomType = {
   participants: RoomParticipantType[];
   messages: MessageType[];
 };
-export type MinimalUser = Pick<UserType, "id" | "name">;
+export type MinimalUser = Pick<UserType, "id" | "name" | "image">;
 export type MinimalMessage = Pick<
   MessageType,
   | "id"
@@ -46,6 +46,7 @@ export type RoomParticipantType = {
   user: UserType;
 };
 export type UserType = {
+  image?: string | null;
   id: string;
   name: string;
   rooms: RoomParticipantType[];

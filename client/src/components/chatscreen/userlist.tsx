@@ -1,4 +1,4 @@
-import type { RoomParticipantType } from "@/types";
+import type { MinimalUser } from "@/types";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useSession } from "next-auth/react";
@@ -16,7 +16,7 @@ export default function UserList() {
     data: users = [],
     isLoading,
     error,
-  } = useQuery<RoomParticipantType[]>({
+  } = useQuery<MinimalUser[]>({
     queryKey: ["known-users"],
     queryFn: async () => {
       try {
@@ -38,10 +38,18 @@ export default function UserList() {
   if (error) {
     return <div>"Unexpected error occured !"</div>;
   }
+
   return (
     <div className="w-full ">
       {users?.map((user) => (
-        <UserCard key={user.id} user={user} />
+        <UserCard
+          key={user.id}
+          user={{
+            id: user.id,
+            name: user.name,
+            image: user.image,
+          }}
+        />
       ))}
     </div>
   );

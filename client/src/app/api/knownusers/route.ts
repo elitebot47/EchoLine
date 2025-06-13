@@ -1,5 +1,6 @@
 import { getUser } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
+import type { MinimalUser } from "@/types";
 import { NextResponse } from "next/server";
 
 export async function GET() {
@@ -30,6 +31,7 @@ export async function GET() {
         roomId: true,
         user: {
           select: {
+            image: true,
             id: true,
             name: true,
           },
@@ -41,7 +43,8 @@ export async function GET() {
       id: p.user.id,
       name: p.user.name,
       roomId: p.roomId,
-    }));
+      image: p.user.image,
+    })) as MinimalUser[];
 
     return NextResponse.json({ users });
   } catch (error) {

@@ -44,6 +44,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             id: user.id,
             email: user.email,
             name: user.name,
+            image: user.image,
           };
         } catch (error) {
           console.log("error while login:", error);
@@ -60,6 +61,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.id = user.id;
         token.email = user.email;
         token.name = user.name;
+        token.image = user.image;
       }
       return token;
     },
@@ -69,6 +71,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           session.user.id = token.id;
           session.user.email = token.email;
           session.user.name = token.name;
+          session.user.image = token.image;
         }
       }
       return session;

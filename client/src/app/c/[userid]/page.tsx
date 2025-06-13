@@ -41,6 +41,7 @@ export default async function ChatViewPage({
               select: {
                 id: true,
                 name: true,
+                image: true,
               },
             },
           },
@@ -76,7 +77,7 @@ export default async function ChatViewPage({
               userId: true,
               roomId: true,
               room: { select: { id: true } },
-              user: { select: { id: true, name: true } },
+              user: { select: { id: true, name: true, image: true } },
             },
           },
           messages: {
@@ -107,7 +108,7 @@ export default async function ChatViewPage({
       <div className="h-14 text-white backdrop-blur-lg bg-black/30 z-10 w-full flex gap-9 absolute top-0">
         <ChatScreenHeader users={room.participants.map((p) => p.user)} />
       </div>
-      <div className="flex-1 absolute border-2 border-black w-full   z-0 h-screen  overflow-auto">
+      <div className="flex-1 absolute   w-full   z-0 h-screen  overflow-auto">
         <ChatViewArea
           Messages={
             room?.messages.filter(

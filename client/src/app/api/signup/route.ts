@@ -32,6 +32,8 @@ export async function POST(req: NextRequest) {
         email: normalizedEmail,
         password: hashedPassword,
         name,
+        image:
+          "https://i.pinimg.com/236x/08/35/0c/08350cafa4fabb8a6a1be2d9f18f2d88.jpg",
       },
     });
 

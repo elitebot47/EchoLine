@@ -7,6 +7,8 @@ export default function SettingsPage({}) {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       className="overflow-hidden h-screen origin-left absolute left-0 top-full  w-full  bg-white shadow-lg border z-10"
-    ></motion.div>
+    >
+      hey this is settings
+    </motion.div>
   );
 }

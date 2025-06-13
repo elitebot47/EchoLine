@@ -20,8 +20,10 @@ import type { MinimalUser } from "@/types";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowLeft, MenuIcon } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import { Avatar, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import UserCard from "./usercard";
@@ -78,42 +80,77 @@ export default function AccessibilityCard({ users }: { users: MinimalUser[] }) {
               <DropdownMenuTrigger className="  cursor-pointer ring-0 focus:ring-0 focus:border-0 border-0 hover:border-0 hover:ring-0 flex justify-center items-center ">
                 <MenuIcon className="hover:scale-110 duration-500" size={35} />
               </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuLabel>{session.user?.name}</DropdownMenuLabel>
+              <DropdownMenuContent className="border-2  border-white/20 bg-white/30 backdrop-blur-lg shadow-2xl ">
+                <DropdownMenuLabel className="font-bold ">
+                  <div
+                    className=" gap-1.5 flex
+                  items-center"
+                  >
+                    <div>
+                      {session.user?.image && (
+                        <Avatar className=" size-7">
+                          <AvatarImage
+                            loading="lazy"
+                            src={`${session.user?.image}`}
+                          />
+                        </Avatar>
+                      )}
+                    </div>
+                    <div>{session.user?.name}</div>
+                  </div>
+                </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>Saved Chats</DropdownMenuItem>
-                <DropdownMenuItem>Settings</DropdownMenuItem>
+                <DropdownMenuItem className="cursor-pointer">
+                  Saved Chats
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild className="cursor-pointer">
+                  <Link href={`/c/settings`}>Settings</Link>
+                </DropdownMenuItem>
 
                 <Dialog>
                   <DialogTrigger className="w-full">
                     <DropdownMenuItem
                       onSelect={(e) => e.preventDefault()}
-                      className={` hover:!bg-red-500 hover:!text-white text-red-500`}
+                      className={` hover:!bg-red-500 cursor-pointer hover:!text-white text-red-500`}
                     >
                       Logout
                     </DropdownMenuItem>
                   </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Are you absolutely sure?</DialogTitle>
-                      <DialogDescription>
-                        This will log you out of your account.
-                      </DialogDescription>
-                    </DialogHeader>
-                    <div className="flex justify-end gap-2 mt-4">
-                      <DialogClose asChild>
-                        <Button>cancel</Button>
-                      </DialogClose>
-                      <Button
-                        variant="destructive"
-                        onClick={() => {
-                          signOut({ callbackUrl: "/signin" });
-                          toast.info("Logging out...");
-                        }}
+                  <DialogContent className="bg-black/30 ">
+                    <AnimatePresence>
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0 }}
+                        className="shadow-2xl shadow-black/30  flex flex-col bg-white backdrop-blur-lg p-3 rounded-2xl"
                       >
-                        Logout
-                      </Button>
-                    </div>
+                        <DialogHeader className="m-2.5 mr-0">
+                          <DialogTitle className="text-2xl font-bold">
+                            Are you absolutely sure?
+                          </DialogTitle>
+                          <DialogDescription className="text-xl">
+                            This will log you out of your account.
+                          </DialogDescription>
+                        </DialogHeader>
+                        <div className="flex justify-end gap-2 mt-4">
+                          <DialogClose asChild>
+                            <Button className="cursor-pointer text-center  hover:scale-105">
+                              Cancel
+                            </Button>
+                          </DialogClose>
+                          <Button
+                            className="text-center cursor-pointer hover:scale-105"
+                            variant="destructive"
+                            onClick={() => {
+                              signOut({ callbackUrl: "/signin" });
+                              toast.info("Logging out...");
+                            }}
+                          >
+                            Logout
+                          </Button>
+                        </div>
+                      </motion.div>
+                    </AnimatePresence>
                   </DialogContent>
                 </Dialog>
               </DropdownMenuContent>

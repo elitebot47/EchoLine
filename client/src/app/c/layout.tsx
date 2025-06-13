@@ -12,7 +12,7 @@ export default async function HomeLayout({
     return <div>Not authenticated</div>;
   }
   const users = await prisma.user.findMany({
-    select: { id: true, name: true },
+    select: { id: true, name: true, image: true },
   });
 
   return <ResponsiveChatLayout users={users}>{children}</ResponsiveChatLayout>;
