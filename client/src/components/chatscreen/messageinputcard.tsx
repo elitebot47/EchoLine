@@ -104,7 +104,7 @@ export default function MessageInputCard({
   }
 
   return (
-    <div className="flex w-full gap-2 justify-center items-center relative p-2 h-full">
+    <div className="flex w-full bg-gray-400  gap-2 justify-center items-center relative p-2 h-full">
       <AnimatePresence>
         {Typingstatus && (
           <motion.div
@@ -122,8 +122,8 @@ export default function MessageInputCard({
       </AnimatePresence>
       <Input
         disabled={uploadbox}
-        className=" rounded-full lg:rounded-lg  h-full w-full lg:!text-xl !text-2xl
-         focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus:border-0 focus:outline-none hover:ring-0 ring-0 border-0  text-white"
+        className=" rounded-full lg:rounded-none  h-full w-full lg:!text-xl !text-2xl
+         focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus:border-0 focus:outline-none hover:ring-0 ring-0 border-0  text-black"
         value={chattext}
         onChange={(e) => {
           setchattext(e.target.value);
@@ -140,6 +140,7 @@ export default function MessageInputCard({
             disabled={uploading}
             onClick={() => setUploadbox(true)}
             size={"icon"}
+            title="Attach"
             className="hover:scale-105 lg:w-16 lg:h-10 w-14 h-12  cursor-pointer"
           >
             <LucidePaperclip />
@@ -165,6 +166,7 @@ export default function MessageInputCard({
               className="w-14 hover:scale-105 lg:w-16 lg:h-10 h-12 cursor-pointer"
               disabled={chattext.length === 0}
               onClick={HandleSend}
+              title="send"
             >
               <SendHorizontalIcon />
             </Button>
@@ -174,17 +176,18 @@ export default function MessageInputCard({
           <motion.div
             key="upload-box"
             layout
-            initial={{ y: 50, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 50, opacity: 0, scale: 0 }}
-            className={` origin-bottom absolute  flex flex-col  gap-2 bottom-full shadow-2xl z-50 shadow-black/50 bg-black/50 backdrop-blur-xl  p-2 rounded-4xl`}
+            initial={{ y: 50, x: 80, opacity: 0, height: 0 }}
+            animate={{ y: 0, x: 0, opacity: 1, height: "auto" }}
+            exit={{ y: 50, x: 80, opacity: 0, height: 0 }}
+            transition={{ duration: 0.2 }}
+            className={`isolate origin-bottom-right overflow-hidden  absolute  flex flex-col  gap-2 bottom-full shadow-2xl z-50 shadow-black/50 bg-black/50 backdrop-blur-xl  p-2 rounded-2xl`}
           >
-            <div className="flex justify-end mr-2">
+            <div className="flex justify-end ">
               <Button
                 onClick={() => {
                   setUploadbox(false);
                 }}
-                className="rounded-full hover:scale-105 bg-black/50 backdrop-blur-lg cursor-pointer w-12 h-9"
+                className="rounded-2xl hover:scale-105 bg-black/50 backdrop-blur-lg cursor-pointer w-12 h-9"
               >
                 <Plus className="rotate-45 size-6" />
               </Button>

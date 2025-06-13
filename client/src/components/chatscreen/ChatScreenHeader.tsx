@@ -12,7 +12,7 @@ export default function ChatScreenHeader({ users }: { users: MinimalUser[] }) {
   const setChat = useShowChatStore((state) => state.setShowChat);
 
   return (
-    <div className="text-2xl px-2 h-full  items-center flex w-full ">
+    <div className="text-2xl px-2 h-full bg-black/20  items-center flex w-full ">
       <div className="flex-1 block lg:hidden ">
         {Chat && (
           <Button onClick={() => setChat(false)}>

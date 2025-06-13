@@ -70,15 +70,15 @@ export default function ChatViewArea({
   return (
     <div className="relative h-full w-full overflow-hidden">
       <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
+        initial={{ opacity: 0, scale: 1.1 }}
+        animate={{ opacity: 1, scale: 1 }}
         transition={{ ease: "easeInOut", duration: 0.7 }}
         className="origin-left h-full w-full"
       >
         <div
           id="chat-container"
           ref={chatContainerRef}
-          className="flex flex-col  lg:px-16 px-3  overflow-y-auto w-full gap-1.5 h-full"
+          className="flex flex-col  lg:px-16 px-3 py-16  overflow-y-auto w-full gap-1.5 h-full"
         >
           {messages?.length === 0 && (
             <div className="text-5xl flex justify-center items-center">

@@ -103,11 +103,11 @@ export default async function ChatViewPage({
   }
 
   return (
-    <div className="flex flex-col h-screen  w-full">
-      <div className="h-14 text-white backdrop-blur-md items-center bg-black/70 z-10 w-full flex gap-9">
+    <div className="flex flex-col h-screen relative  w-full">
+      <div className="h-14 text-white backdrop-blur-lg bg-black/30 z-10 w-full flex gap-9 absolute top-0">
         <ChatScreenHeader users={room.participants.map((p) => p.user)} />
       </div>
-      <div className="flex-1 w-full z-0 overflow-auto">
+      <div className="flex-1 absolute border-2 border-black w-full   z-0 h-screen  overflow-auto">
         <ChatViewArea
           Messages={
             room?.messages.filter(
@@ -117,7 +117,7 @@ export default async function ChatViewPage({
           roomId={room.id}
         />
       </div>
-      <div className="w-full lg:h-14 h-16 z-20  bg-black/70">
+      <div className="w-full lg:h-14 h-16 z-20   absolute bottom-0">
         <MessageInputCard id={room.id} participants={room.participants} />
       </div>
     </div>

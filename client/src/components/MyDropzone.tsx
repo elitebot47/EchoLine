@@ -114,6 +114,10 @@ const MyDropzone = ({
   }
   const onDrop = useCallback(
     (acceptedFiles: File[], fileRejections: FileRejection[]) => {
+      if (uploadedFiles.length + acceptedFiles.length > 4) {
+        toast.error("Max upload allowed: 4");
+        return;
+      }
       const newFilesWithPreview: FileWithPreview[] = acceptedFiles.map((file) =>
         Object.assign(file, {
           id: `${file.name}-${file.size}-${Date.now()}-${Math.random()
@@ -129,19 +133,16 @@ const MyDropzone = ({
       }
     },
 
-    []
+    [uploadedFiles]
   );
 
   useEffect(() => {
     return () => {
-      console.log("Running cleanup for", uploadedFiles.length, "files"); // Log cleanup start
       uploadedFiles.forEach((file) => {
         const images = document.images ? Array.from(document.images) : [];
         const stillInDOM = images.some((img) => img.src === file.preview);
-        console.log("Checking file:", file.id, "In DOM?", stillInDOM); // Log per-file check
 
         if (!stillInDOM) {
-          console.log("Revoking URL for:", file.id); // Log before revoking
           URL.revokeObjectURL(file.preview);
         }
       });
@@ -157,7 +158,7 @@ const MyDropzone = ({
     fileRejections,
   } = useDropzone({
     onDrop,
-    maxFiles: 3,
+    maxFiles: 4,
     maxSize: 1024 * 1024 * 5,
     accept: {
       "image/jpeg": [".jpeg", ".jpg"],
@@ -177,17 +178,17 @@ const MyDropzone = ({
         <motion.div
           layout="size"
           transition={{ duration: 0.2 }}
-          className="font-sans     w-full max-w-[900px] min-w-[500px]  overflow-hidden   rounded-4xl"
+          className="font-sans  max-h-[500px]   w-full max-w-[900px] min-w-[500px]  overflow-hidden   rounded-2xl"
         >
           <motion.div
             key={`upload-view-area`}
             layout
             transition={{ duration: 0.2 }}
             {...getRootProps({})}
-            className={`flex flex-col items-center p-10  rounded-4xl border-dashed bg-gray-50/50 text-gray-800   outline-none transition-colors duration-200 cursor-pointer 
-            ${dropzoneBorderColor} ${
+            className={`flex flex-col items-center p-10  rounded-2xl border-dashed bg-gray-50/50 text-gray-800   outline-none transition-colors duration-200 cursor-pointer 
+              ${dropzoneBorderColor} ${
               isDragActive
-                ? "bg-gray-900/30 border-2 w-[800px] h-[500px]  border-dashed backdrop-blur-lg "
+                ? "bg-gray-900/30 border-2 w-[800px]   border-dashed  "
                 : ""
             }`}
           >
@@ -234,7 +235,7 @@ const MyDropzone = ({
           )}
 
           {uploadedFiles.length > 0 && (
-            <motion.div className="mt-5 ">
+            <motion.div className="mt-2 ">
               <ul className="list-none  flex flex-wrap gap-4">
                 {uploadedFiles.map((file) => (
                   <motion.li
@@ -242,7 +243,7 @@ const MyDropzone = ({
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.5 }}
                     key={file.id}
-                    className="border border-gray-200 rounded-4xl p-1 flex h-fit  justify-center  flex-col items-center max-w-[200px] text-center bg-gray-50/50"
+                    className="border border-gray-200 rounded-2xl p-1 flex h-fit  justify-center  flex-col items-center max-w-[200px] text-center bg-gray-50/50"
                   >
                     <div className="relative">
                       <Button
@@ -268,12 +269,12 @@ const MyDropzone = ({
                           <img
                             src={file.preview}
                             alt={file.id}
-                            className=" w-auto max-h-[250px] max-w-[150px] h-fit  object-contain mb-1 rounded-4xl "
+                            className=" w-auto max-h-[250px]  h-fit  object-contain mb-1 rounded-2xl "
                           />
                         )}
                       </div>
                     </div>
-                    <span className="text-[8px] mx-auto break-all overflow-wrap-anywhere">
+                    <span className="text-[8px] mx-auto break-all overflow-auto">
                       {file.name}
                     </span>
                   </motion.li>
@@ -283,10 +284,10 @@ const MyDropzone = ({
           )}
         </motion.div>
         {uploadedFiles.length !== 0 && (
-          <motion.div className=" flex justify-end items-center mr-3 mt-2">
+          <motion.div className=" flex justify-end items-center  mt-2">
             <Button
               key={"sendbutton"}
-              className={`hover:scale-95 w-14 lg:w-16 lg:h-12 h-12 rounded-4xl cursor-pointer`}
+              className={`hover:scale-95 w-14 lg:w-16 lg:h-12 h-12 rounded-2xl cursor-pointer`}
               disabled={uploadedFiles.length === 0 || uploading}
               onClick={() => {
                 HandleSendFiles();

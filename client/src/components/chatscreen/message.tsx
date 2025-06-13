@@ -66,7 +66,7 @@ export default function Message({
           </DropdownMenuTrigger>
           <DropdownMenuContent
             side="left"
-            className={`rounded-3xl translate-x-1`}
+            className={`rounded-2xl translate-x-1`}
           >
             <DropdownMenuItem
               className="cursor-pointer rounded-2xl"
@@ -101,7 +101,7 @@ export default function Message({
             </DropdownMenuItem>
             {MessageData.contentType === "text" ||
             MessageData.contentType === "link" ? (
-              <DropdownMenuItem className={`rounded-4xl cursor-pointer`}>
+              <DropdownMenuItem className={`rounded-2xl cursor-pointer`}>
                 Edit
               </DropdownMenuItem>
             ) : null}
@@ -146,7 +146,7 @@ export default function Message({
               src={MessageData.content}
               alt={MessageData.content || "Uploaded image"}
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 300px"
-              className="rounded-lg  shadow-sm blur-xs transition-all  hover:shadow-md"
+              className="rounded-2xl  shadow-sm blur-lg transition-all  hover:shadow-md"
             />
           ) : (
             <Dialog>
@@ -165,7 +165,7 @@ export default function Message({
                     crop="fit"
                     loading="lazy"
                     placeholder="empty"
-                    className="rounded-lg shadow-sm transition-all hover:scale-105 hover:shadow-md"
+                    className="rounded-2xl shadow-sm transition-all hover:scale-105 hover:shadow-md"
                   />
                 </button>
               </DialogTrigger>
