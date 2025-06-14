@@ -1,16 +1,17 @@
 "use client";
-import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import type { Session } from "next-auth";
 
-import {SessionProvider} from "next-auth/react";
-import type {ReactNode} from "react";
-import {Toaster} from "sonner";
+import { SessionProvider } from "next-auth/react";
+import { type ReactNode } from "react";
+import { Toaster } from "sonner";
 
 export default function Providers({
-                                    children,
-                                    session,
-                                  }: {
+  children,
+  session,
+}: {
   children: ReactNode;
-  session: any;
+  session: Session;
 }) {
   const queryClient = new QueryClient({
     defaultOptions: {
@@ -29,8 +30,8 @@ export default function Providers({
     <QueryClientProvider client={queryClient}>
       <SessionProvider session={session}>
         {children}
-        <Toaster position="top-center"/>
+        <Toaster position="top-center" />
       </SessionProvider>
     </QueryClientProvider>
   );
-};
+}

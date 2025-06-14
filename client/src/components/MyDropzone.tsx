@@ -61,7 +61,8 @@ const MyDropzone = ({
         let filetype;
 
         if (file.type.includes("image")) {
-          const upload_preset = process.env.CLOUDINARY_UPLOAD_PRESET_ROOM_IMAGE;
+          const upload_preset =
+            process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET_ROOM_IMAGE;
           if (!upload_preset) {
             toast.error("Error: upload_preset missing!");
             return;

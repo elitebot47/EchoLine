@@ -2,6 +2,7 @@ import { auth } from "@/auth";
 import { cloudinary } from "@/lib/cloudinary";
 import { prisma } from "@/lib/prisma";
 import type { ContentType } from "@prisma/client";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function DELETE(req: NextRequest) {
@@ -16,7 +17,9 @@ export async function DELETE(req: NextRequest) {
   }
 
   try {
-    const deletedMessage = await prisma.message.delete({ where: { id } });
+    const deletedMessage = await prisma.message.delete({
+      where: { id: id, fromId: session.user.id },
+    });
 
     const response = NextResponse.json(
       {
@@ -34,6 +37,21 @@ export async function DELETE(req: NextRequest) {
 
     return response;
   } catch (error) {
+    if (error instanceof PrismaClientKnownRequestError) {
+      if (error.code === "P2025") {
+        console.warn(
+          `Attempted to delete message ID ${id} by user ${session.user.id}, but it was not found or not owned by user.`
+        );
+        return new Response(
+          JSON.stringify({
+            message:
+              "Message not found or you don't have permission to delete it.",
+            success: false,
+          }),
+          { status: 404 }
+        );
+      }
+    }
     return NextResponse.json(
       {
         success: false,

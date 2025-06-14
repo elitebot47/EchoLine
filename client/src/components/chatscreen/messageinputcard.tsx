@@ -9,7 +9,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { find } from "linkifyjs";
 import { LucidePaperclip, Plus, SendHorizontalIcon } from "lucide-react";
 import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import MyDropzone from "../MyDropzone";
 import { Button } from "../ui/button";
@@ -33,33 +33,13 @@ export default function MessageInputCard({
 
   const addMessage = useMessagesStore((state) => state.addMessage);
   const [chattext, setchattext] = useState("");
-  const [Typingstatus, setTypingstatus] = useState(false);
+
   const [uploadbox, setUploadbox] = useState(false);
-  useEffect(() => {
-    if (!socket || !id) return;
-
-    let typingTimeout: NodeJS.Timeout | undefined;
-
-    const handler = () => {
-      setTypingstatus(true);
-      if (typingTimeout) clearTimeout(typingTimeout);
-      typingTimeout = setTimeout(() => setTypingstatus(false), 1000);
-    };
-
-    socket.on("UserTypingStatus", handler);
-
-    return () => {
-      socket.off("UserTypingStatus", handler);
-      if (typingTimeout) clearTimeout(typingTimeout);
-      setTypingstatus(false);
-    };
-  }, [socket, id]);
 
   const recipient = participants.find(
     (user) => user.user.id !== session?.user?.id
   );
   async function HandleSend() {
-    setTypingstatus(false);
     if (!chattext) {
       return;
     }
@@ -105,21 +85,6 @@ export default function MessageInputCard({
 
   return (
     <div className="flex w-full bg-gray-400  gap-2 justify-center items-center relative p-2 h-full">
-      <AnimatePresence>
-        {Typingstatus && (
-          <motion.div
-            initial={{ opacity: 0, scaleY: 0 }}
-            animate={{ opacity: 1, scaleY: 1 }}
-            exit={{ opacity: 0, scaleY: 0 }}
-            transition={{ duration: 0.2 }}
-            className={`absolute bottom-full origin-bottom 
-          
-          w-full bg-gray-500/30    backdrop-blur-md px-5   mr-auto `}
-          >
-            <span className="animate-pulse text-black">typing</span>
-          </motion.div>
-        )}
-      </AnimatePresence>
       <Input
         disabled={uploadbox}
         className=" rounded-full lg:rounded-none  h-full w-full lg:!text-xl !text-2xl
@@ -146,32 +111,28 @@ export default function MessageInputCard({
             <LucidePaperclip />
           </Button>
         </motion.div>
-        {!uploadbox && (
-          <motion.div
-            className=" origin-right"
-            key="send-button-container"
-            initial={{ opacity: 0, scaleX: 0.6 }}
-            animate={{
-              opacity: 1,
-              scaleX: 1,
-              transition: {
-                type: "spring",
-                stiffness: 400,
-                damping: 15,
-              },
-            }}
-            transition={{ duration: 0.2 }}
-          >
-            <Button
-              className="w-14 hover:scale-105 lg:w-16 lg:h-10 h-12 cursor-pointer"
-              disabled={chattext.length === 0}
-              onClick={HandleSend}
-              title="send"
+        {uploadbox ||
+          (chattext.length !== 0 && (
+            <motion.div
+              className=" origin-right"
+              key="send-button-container"
+              initial={{ opacity: 0, scaleX: 0.6 }}
+              animate={{
+                opacity: 1,
+                scaleX: 1,
+                transition: {},
+              }}
+              transition={{ duration: 0.2 }}
             >
-              <SendHorizontalIcon />
-            </Button>
-          </motion.div>
-        )}
+              <Button
+                className="w-14 hover:scale-105 lg:w-16 lg:h-10 h-12 cursor-pointer"
+                onClick={HandleSend}
+                title="send"
+              >
+                <SendHorizontalIcon />
+              </Button>
+            </motion.div>
+          ))}
         {uploadbox && (
           <motion.div
             key="upload-box"

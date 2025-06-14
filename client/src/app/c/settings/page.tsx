@@ -27,6 +27,8 @@ export default function SettingPage() {
   const [Imagepreviewdata, setImagepreviewdata] =
     useState<FileWithPreview | null>(null);
   const [imageUpdateLoader, setImageUpdateLoader] = useState(false);
+  const avatarActionLoader = useRef<boolean>(false);
+
   async function ViewImagePreview(e: React.ChangeEvent<HTMLInputElement>) {
     console.log("currently in view async function");
 
@@ -51,7 +53,6 @@ export default function SettingPage() {
     setImageviewdialog(true);
   }
 
-  const avatarActionLoader = useRef<boolean>(false);
   return (
     <div className="flex flex-col items-center gap-5 p-4">
       <div className="text-3xl">settings page</div>
@@ -84,7 +85,7 @@ export default function SettingPage() {
               variant={"destructive"}
               className="hover:bg-red-600/70  duration-500 cursor-pointer"
             >
-              {!!avatarActionLoader.current ? (
+              {avatarActionLoader.current ? (
                 <Spinner size="lg" />
               ) : (
                 "Delete Profile Picure"

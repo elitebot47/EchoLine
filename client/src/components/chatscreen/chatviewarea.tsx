@@ -70,8 +70,8 @@ export default function ChatViewArea({
   return (
     <div className="relative h-full w-full overflow-hidden">
       <motion.div
-        initial={{ opacity: 0, scale: 1.1 }}
-        animate={{ opacity: 1, scale: 1 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
         transition={{ ease: "easeInOut", duration: 0.7 }}
         className="origin-left h-full w-full"
       >

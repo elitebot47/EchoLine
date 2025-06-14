@@ -102,11 +102,16 @@ export default async function ChatViewPage({
   if (!room) {
     return <div>Room not found or could not be created.</div>;
   }
-
+  const thisUser = room.participants.find(
+    (user) => user.user.id !== User.id
+  )?.user;
+  if (!thisUser) {
+    return <div>Error while fecthing user's Profile</div>;
+  }
   return (
     <div className="flex flex-col h-screen relative  w-full">
-      <div className="h-14 text-white backdrop-blur-lg bg-black/30 z-10 w-full flex gap-9 absolute top-0">
-        <ChatScreenHeader users={room.participants.map((p) => p.user)} />
+      <div className="h-16 text-white backdrop-blur-lg bg-black/30 z-10 w-full flex gap-9 absolute top-0">
+        <ChatScreenHeader roomId={room.id} user={thisUser} />
       </div>
       <div className="flex-1 absolute   w-full   z-0 h-screen  overflow-auto">
         <ChatViewArea

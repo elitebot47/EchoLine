@@ -16,6 +16,7 @@ import {
 import { useMessagesStore } from "@/stores/MessagesStore";
 import { useSocketStore } from "@/stores/SocketStore";
 import axios from "axios";
+import clsx from "clsx";
 import { AnimatePresence, easeIn, motion } from "framer-motion";
 import { Ellipsis, X } from "lucide-react";
 import { CldImage } from "next-cloudinary";
@@ -39,7 +40,6 @@ export default function Message({
     const mine = MyId === MessageData.fromId;
     setmine(mine);
   }, [MyId]);
-
   const time = new Date(MessageData.createdAt).toLocaleTimeString([], {
     hour: "2-digit",
     minute: "2-digit",
@@ -69,7 +69,9 @@ export default function Message({
             className={`rounded-2xl translate-x-1`}
           >
             <DropdownMenuItem
-              className="cursor-pointer rounded-2xl"
+              className={clsx("cursor-pointer", "rounded-2xl", {
+                hidden: MessageData.fromId !== MyId,
+              })}
               onClick={async () => {
                 setDeleting(true);
 
