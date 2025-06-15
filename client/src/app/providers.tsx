@@ -11,7 +11,7 @@ export default function Providers({
   session,
 }: {
   children: ReactNode;
-  session: Session;
+  session: Session | null;
 }) {
   const queryClient = new QueryClient({
     defaultOptions: {
@@ -25,7 +25,7 @@ export default function Providers({
         retry: 1,
       },
     },
-  }); 
+  });
   return (
     <QueryClientProvider client={queryClient}>
       <SessionProvider session={session}>

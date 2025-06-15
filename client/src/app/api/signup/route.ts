@@ -17,8 +17,8 @@ export async function POST(req: NextRequest) {
     name: name.trim(),
   });
 
-  if (!zodCheck.error) {
-    console.log(zodCheck.error);
+  if (zodCheck.error) {
+    console.log("zod error:", zodCheck.error);
     return NextResponse.json(
       {
         message: `${zodCheck.error}`,
@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       if (error.code === "P2002") {
-        console.log(error.code);
+        console.log("error:", error.code);
 
         return NextResponse.json(
           {

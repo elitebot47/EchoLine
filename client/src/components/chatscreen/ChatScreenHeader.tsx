@@ -6,9 +6,9 @@ import type { MinimalUser } from "@/types";
 import clsx from "clsx";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
-import Image from "next/image";
 import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
+import CustomAvatar from "../ui/customavatar";
 export default function ChatScreenHeader({
   user,
   roomId,
@@ -59,12 +59,11 @@ export default function ChatScreenHeader({
       <div className="h-full items-center flex gap-2">
         <div>
           {user.image && (
-            <Image
+            <CustomAvatar
               className={`rounded-full`}
               width={50}
               height={50}
               alt={user.image}
-              loading="lazy"
               src={`${user?.image}`}
             />
           )}

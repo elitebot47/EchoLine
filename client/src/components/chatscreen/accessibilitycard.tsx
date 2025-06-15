@@ -20,12 +20,12 @@ import type { MinimalUser } from "@/types";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowLeft, MenuIcon } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
-import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "../ui/button";
+import CustomAvatar from "../ui/customavatar";
 import { Input } from "../ui/input";
 import UserCard from "./usercard";
 
@@ -89,12 +89,11 @@ export default function AccessibilityCard({ users }: { users: MinimalUser[] }) {
                   >
                     <div>
                       {session.user?.image && (
-                        <Image
+                        <CustomAvatar
                           className="rounded-full object-cover aspect-square"
                           width={40}
                           height={40}
                           alt={session.user.image}
-                          loading="lazy"
                           src={`${session.user?.image}`}
                         />
                       )}

@@ -10,8 +10,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import Image from "next/image";
 
+import CustomAvatar from "@/components/ui/customavatar";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Spinner from "@/components/ui/spinner";
@@ -60,13 +60,11 @@ export default function SettingPage() {
       <div className="text-3xl">settings page</div>
       <div className="flex flex-col gap-3.5 justify-center items-center">
         {session.user?.image && (
-          <Image
-            className={`rounded-full`}
+          <CustomAvatar
             width={120}
             height={120}
             alt={session.user.image}
-            loading="lazy"
-            src={`${session.user?.image}`}
+            src={`${session.user.image}`}
           />
         )}
         <div className="flex gap-2">
