@@ -7,7 +7,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { AnimatePresence, motion } from "framer-motion";
 import { find } from "linkifyjs";
-import { LucidePaperclip, Plus, SendHorizontalIcon } from "lucide-react";
+import { LucidePaperclip, Plus, SendHorizonalIcon } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -55,7 +55,7 @@ export default function MessageInputCard({
 
     try {
       if (!recipient) {
-        toast.error("Error:Connection error ,please try again later");
+        toast.error("Error:recipient error ,please try again later");
         return;
       }
       const res = await axios.post("/api/message/add", {
@@ -75,11 +75,15 @@ export default function MessageInputCard({
           refetchType: "active",
         });
       }
+      console.log("now sending socket message to other user");
 
       socket?.emit("Chat_client", res.data);
+      console.log("socket message recived");
       setchattext("");
     } catch (error) {
-      toast.error(`error:Failed to send message`);
+      console.log(error);
+
+      toast.error(`error:${error}`);
     }
   }
 
@@ -88,7 +92,7 @@ export default function MessageInputCard({
       <Input
         disabled={uploadbox}
         className=" rounded-full lg:rounded-none  h-full w-full lg:!text-xl !text-2xl
-         focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus:border-0 focus:outline-none hover:ring-0 ring-0 border-0  text-black"
+         focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus:border-0 focus:outline-none hover:ring-0 ring-0 border-0 bg-transparent  text-black"
         value={chattext}
         onChange={(e) => {
           setchattext(e.target.value);
@@ -129,7 +133,7 @@ export default function MessageInputCard({
                 onClick={HandleSend}
                 title="send"
               >
-                <SendHorizontalIcon />
+                <SendHorizonalIcon />
               </Button>
             </motion.div>
           ))}

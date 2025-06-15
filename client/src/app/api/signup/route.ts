@@ -1,15 +1,27 @@
 import { HashPassword } from "@/lib/hash";
 import { prisma } from "@/lib/prisma";
+import { UserCreateSchema } from "@/lib/schemas/user";
 import { Prisma } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
-  const { email, password, name } = await req.json();
+  const {
+    email,
+    password,
+    name,
+  }: { email: string; password: string; name: string } = await req.json();
   const normalizedEmail = email.trim().toLowerCase();
-  if (!normalizedEmail || !password || !name) {
+  const zodCheck = UserCreateSchema.safeParse({
+    email: normalizedEmail,
+    password: password.trim(),
+    name: name.trim(),
+  });
+
+  if (!zodCheck.error) {
+    console.log(zodCheck.error);
     return NextResponse.json(
       {
-        message: "All 3 fields are required!",
+        message: `${zodCheck.error}`,
       },
       { status: 400 }
     );

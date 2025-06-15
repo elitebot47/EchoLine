@@ -1,12 +1,12 @@
 "use client";
 
-import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { useShowChatStore } from "@/stores/showChatStore";
 import { useSocketStore } from "@/stores/SocketStore";
 import type { MinimalUser } from "@/types";
 import clsx from "clsx";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 export default function ChatScreenHeader({
@@ -59,21 +59,23 @@ export default function ChatScreenHeader({
       <div className="h-full items-center flex gap-2">
         <div>
           {user.image && (
-            <Avatar className="border-2 border-white/25 size-13">
-              <AvatarImage loading="lazy" src={`${user?.image}`} />
-            </Avatar>
+            <Image
+              className={`rounded-full`}
+              width={50}
+              height={50}
+              alt={user.image}
+              loading="lazy"
+              src={`${user?.image}`}
+            />
           )}
         </div>
-        <motion.div
-          layout
-          className="flex py-4  h-full justify-center flex-col "
-        >
+        <motion.div layout className="flex   h-full justify-center flex-col ">
           <AnimatePresence mode="sync">
             <motion.div
               key={"user-name"}
               className={clsx(
                 "duration-300 text-3xl  ",
-                " text-center   h-fit"
+                " text-center flex justify-center items-center "
               )}
             >
               {user.name}
@@ -89,7 +91,7 @@ export default function ChatScreenHeader({
                   repeatType: "reverse",
                   ease: "easeInOut",
                 }}
-                className="text-sm mb-2 mt-0 pt-0  text-black"
+                className="flex justify-start items-center text-sm mb-2 mt-0 pt-0  text-green-500"
               >
                 Typing...
               </motion.div>

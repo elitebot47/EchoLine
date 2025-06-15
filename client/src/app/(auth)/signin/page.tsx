@@ -1,6 +1,8 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import Spinner from "@/components/ui/spinner";
+import { UserSigninSchema } from "@/lib/schemas/user";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -20,6 +22,12 @@ export default function SignInPage() {
 
     setLoader(true);
     try {
+      const zodCheck = UserSigninSchema.safeParse({ email, password });
+      if (!zodCheck.error) {
+        toast.error(`${zodCheck.error}`);
+        console.log(zodCheck.error);
+        return;
+      }
       const response = await signIn("credentials", {
         redirect: false,
         email: String(email).trim().toLowerCase(),
@@ -50,6 +58,11 @@ export default function SignInPage() {
   return (
     <div>
       <div>
+        <Button onClick={() => signIn("google", { redirectTo: "/c" })}>
+          Sign in with Google
+        </Button>
+      </div>
+      <div>
         <Input
           value={email}
           onChange={(e) => setEmail(e.target.value)}
@@ -67,7 +80,7 @@ export default function SignInPage() {
       </div>
       <div>
         <Button onClick={HandleSubmit} className="cursor-pointer">
-          Sign in
+          {loader ? <Spinner /> : "Sign in"}
         </Button>
       </div>
       <Link href={"/signup"}>Signup here</Link>

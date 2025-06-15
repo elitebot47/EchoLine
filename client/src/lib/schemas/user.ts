@@ -5,3 +5,7 @@ export const UserCreateSchema = z.object({
   email: z.string().min(6, "Invalid email!"),
   password: z.string().min(6, "Password must be at least 8 characters"),
 });
+export const UserSigninSchema = z.object({
+  email: z.string().min(6, "Invalid email! must be atleast 6 letter long"),
+  password: z.string().min(6, "Password must be at least 8 characters"),
+});

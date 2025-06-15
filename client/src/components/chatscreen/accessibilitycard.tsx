@@ -20,10 +20,11 @@ import type { MinimalUser } from "@/types";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowLeft, MenuIcon } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { Avatar, AvatarImage } from "../ui/avatar";
+
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import UserCard from "./usercard";
@@ -77,7 +78,7 @@ export default function AccessibilityCard({ users }: { users: MinimalUser[] }) {
             transition={{ duration: 0.1 }}
           >
             <DropdownMenu>
-              <DropdownMenuTrigger className="  cursor-pointer ring-0 focus:ring-0 focus:border-0 border-0 hover:border-0 hover:ring-0 flex justify-center items-center ">
+              <DropdownMenuTrigger className=" cursor-pointer [&[data-state=open]]:bg-transparent focus:ring-0 focus:ring-offset-0 ring-0 flex justify-center items-center ">
                 <MenuIcon className="hover:scale-110 duration-500" size={35} />
               </DropdownMenuTrigger>
               <DropdownMenuContent className="border-2  border-white/20 bg-white/30 backdrop-blur-lg shadow-2xl ">
@@ -88,12 +89,14 @@ export default function AccessibilityCard({ users }: { users: MinimalUser[] }) {
                   >
                     <div>
                       {session.user?.image && (
-                        <Avatar className=" size-7">
-                          <AvatarImage
-                            loading="lazy"
-                            src={`${session.user?.image}`}
-                          />
-                        </Avatar>
+                        <Image
+                          className="rounded-full object-cover aspect-square"
+                          width={40}
+                          height={40}
+                          alt={session.user.image}
+                          loading="lazy"
+                          src={`${session.user?.image}`}
+                        />
                       )}
                     </div>
                     <div>{session.user?.name}</div>

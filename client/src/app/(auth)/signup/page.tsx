@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Spinner from "@/components/ui/spinner";
+import { UserCreateSchema } from "@/lib/schemas/user";
 import axios from "axios";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -17,11 +18,14 @@ export default function SignUpPage() {
   const router = useRouter();
   async function HandleSignup() {
     setLoader(true);
-    if (!email || !password || !name) {
-      toast.error("All fields are required!");
+    const zodCheck = UserCreateSchema.safeParse({ email, password, name });
+    if (!zodCheck.error) {
+      toast.error(`${zodCheck.error}`);
+      console.log(zodCheck.error);
       setLoader(false);
       return;
     }
+
     try {
       const res = await axios.post(`/api/signup`, {
         email: email.trim().toLowerCase(),
@@ -29,7 +33,6 @@ export default function SignUpPage() {
         name: name.trim(),
       });
       console.log(`response form signup route:${res.data.message}`);
-
       toast.success(res.data.message);
 
       setLoader(false);

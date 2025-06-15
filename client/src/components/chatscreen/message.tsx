@@ -103,7 +103,11 @@ export default function Message({
             </DropdownMenuItem>
             {MessageData.contentType === "text" ||
             MessageData.contentType === "link" ? (
-              <DropdownMenuItem className={`rounded-2xl cursor-pointer`}>
+              <DropdownMenuItem
+                className={clsx("cursor-pointer", "rounded-2xl", {
+                  // hidden: MessageData.fromId !== MyId,
+                })}
+              >
                 Edit
               </DropdownMenuItem>
             ) : null}

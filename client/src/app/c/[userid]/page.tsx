@@ -3,6 +3,7 @@ import ChatViewArea from "@/components/chatscreen/chatviewarea";
 import MessageInputCard from "@/components/chatscreen/messageinputcard";
 import { getUser } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
+
 import type { MinimalMessage } from "@/types";
 
 export default async function ChatViewPage({
@@ -15,7 +16,12 @@ export default async function ChatViewPage({
   if (!User?.id) {
     return <div>Not authorised, Login first</div>;
   }
+  console.log("c/page.tsx");
+
+  console.log("userid", userid);
+
   const myId = User.id;
+  console.log("myid", myId);
   if (userid === myId) {
     return <div>Chat Unavailable, you can't message yourself</div>;
   }

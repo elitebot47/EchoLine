@@ -1,6 +1,6 @@
 "use client";
 import type { FileWithPreview } from "@/components/MyDropzone";
-import { Avatar, AvatarImage } from "@/components/ui/avatar";
+
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -10,6 +10,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import Image from "next/image";
+
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Spinner from "@/components/ui/spinner";
@@ -58,9 +60,14 @@ export default function SettingPage() {
       <div className="text-3xl">settings page</div>
       <div className="flex flex-col gap-3.5 justify-center items-center">
         {session.user?.image && (
-          <Avatar className=" size-40 border-2 border-black">
-            <AvatarImage loading="lazy" src={`${session.user?.image}`} />
-          </Avatar>
+          <Image
+            className={`rounded-full`}
+            width={120}
+            height={120}
+            alt={session.user.image}
+            loading="lazy"
+            src={`${session.user?.image}`}
+          />
         )}
         <div className="flex gap-2">
           <div>

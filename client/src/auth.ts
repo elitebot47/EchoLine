@@ -1,10 +1,38 @@
 import NextAuth from "next-auth";
 import type { JWT } from "next-auth/jwt";
 import Credentials from "next-auth/providers/credentials";
+import Google from "next-auth/providers/google";
 import { VerifyPassword } from "./lib/hash";
 import { prisma } from "./lib/prisma";
+declare module "next-auth" {
+  interface Session {
+    user: {
+      id: string;
+      email: string;
+      name: string | null;
+      image: string | null;
+    };
+  }
+  interface User {
+    id: string;
+    email: string;
+    name: string | null;
+    image: string | null;
+  }
+}
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
+    Google({
+      clientId: process.env.AUTH_GOOGLE_ID,
+      clientSecret: process.env.AUTH_GOOGLE_SECRET,
+      authorization: {
+        params: {
+          prompt: "consent",
+          access_type: "offline",
+          response_type: "code",
+        },
+      },
+    }),
     Credentials({
       name: "Email and password",
       credentials: {
@@ -56,16 +84,36 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   ],
   session: { strategy: "jwt" },
   callbacks: {
-    async jwt({ token, user }: { token: JWT; user?: any }) {
+    async jwt({ token, user, account }) {
       if (user) {
         token.id = user.id;
         token.email = user.email;
         token.name = user.name;
         token.image = user.image;
       }
+      if (account?.provider === "google" && user?.email && user.name) {
+        try {
+          let dbUser = await prisma.user.findUnique({
+            where: { email: user.email },
+          });
+
+          if (!dbUser) {
+            dbUser = await prisma.user.create({
+              data: {
+                email: user.email,
+                name: user.name,
+                image: user.image,
+              },
+            });
+          }
+          token.id = dbUser.id;
+        } catch (error) {
+          console.error("Error handling Google user:", error);
+        }
+      }
       return token;
     },
-    async session({ session, token }: { session: any; token?: JWT }) {
+    async session({ session, token }: { session: any; token: JWT }) {
       if (session.user) {
         if (token) {
           session.user.id = token.id;

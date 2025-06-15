@@ -1,9 +1,9 @@
+import { auth } from "@/auth";
+import SocketInitializer from "@/components/Socketinitializer";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { auth } from "@/auth";
 import Providers from "./providers";
-import SocketInitializer from "@/components/Socketinitializer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,10 +31,12 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Providers session={session}>
-          <SocketInitializer />
-          {children}
-        </Providers>
+        {session && (
+          <Providers session={session}>
+            <SocketInitializer />
+            {children}
+          </Providers>
+        )}
       </body>
     </html>
   );
