@@ -7,7 +7,7 @@ type MessagesStoreType = {
   addMessage: (input: MinimalMessage) => void;
   emptyMessages: () => void;
   replaceMessage: (id: string, message: MinimalMessage) => void;
-  deletedMessage: (id: string) => void;
+  deleteMessage: (id: string) => void;
 };
 
 export const useMessagesStore = create<MessagesStoreType>((set) => ({
@@ -27,7 +27,7 @@ export const useMessagesStore = create<MessagesStoreType>((set) => ({
         .map((msg) => (msg.id === id ? newMessage : msg))
         .filter(Boolean),
     })),
-  deletedMessage: (id) =>
+  deleteMessage: (id) =>
     set((state) => ({
       messages: state.messages?.filter((message) => message.id !== id),
     })),

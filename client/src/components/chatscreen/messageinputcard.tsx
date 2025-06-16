@@ -145,7 +145,7 @@ export default function MessageInputCard({
             animate={{ y: 0, x: 0, opacity: 1, height: "auto" }}
             exit={{ y: 50, x: 80, opacity: 0, height: 0 }}
             transition={{ duration: 0.2 }}
-            className={`isolate origin-bottom-right overflow-hidden  absolute  flex flex-col  gap-2 bottom-full shadow-2xl z-50 shadow-black/50 bg-black/50 backdrop-blur-xl  p-2 rounded-2xl`}
+            className={`    overflow-hidden  absolute  flex flex-col  gap-2 bottom-full shadow-2xl z-50 shadow-black/50 bg-black/50 backdrop-blur-xl  p-2 rounded-2xl`}
           >
             <div className="flex justify-end ">
               <Button

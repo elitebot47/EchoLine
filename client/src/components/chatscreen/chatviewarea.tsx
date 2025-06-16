@@ -21,7 +21,7 @@ export default function ChatViewArea({
   const messages = useMessagesStore((state) => state.messages);
   const addMessage = useMessagesStore((state) => state.addMessage);
   const setMessages = useMessagesStore((state) => state.setMessages);
-  const deletedMessage = useMessagesStore((state) => state.deletedMessage);
+  const deletedMessage = useMessagesStore((state) => state.deleteMessage);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     setMessages(Messages?.filter(Boolean) ?? []);
@@ -78,7 +78,7 @@ export default function ChatViewArea({
         <div
           id="chat-container"
           ref={chatContainerRef}
-          className="flex flex-col  lg:px-16 px-3 py-16  overflow-y-auto w-full scroll-smooth gap-1.5 h-full"
+          className="flex flex-col  lg:px-16 px-3 pb-16 pt-18  overflow-y-auto w-full scroll-smooth gap-1.5 h-full"
         >
           {messages?.length === 0 && (
             <div className="text-5xl flex justify-center items-center">

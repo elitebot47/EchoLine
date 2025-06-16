@@ -13,14 +13,21 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
 import { useMessagesStore } from "@/stores/MessagesStore";
 import { useSocketStore } from "@/stores/SocketStore";
+import type { MessageType } from "@/types";
 import axios from "axios";
 import clsx from "clsx";
 import { AnimatePresence, easeIn, motion } from "framer-motion";
 import { Ellipsis, X } from "lucide-react";
 import { CldImage } from "next-cloudinary";
 import { useEffect, useState } from "react";
+import type { Socket } from "socket.io-client";
 import { toast } from "sonner";
 import { MessageStatus } from "../message/messageStatus";
 import Spinner from "../ui/spinner";
@@ -32,18 +39,15 @@ export default function Message({
   MyId: string;
 }) {
   const [imageloading, setImageloading] = useState(true);
-  const [mine, setmine] = useState(false);
+  const [isMine, setisMine] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const deletedMessage = useMessagesStore((state) => state.deletedMessage);
+  const deleteMessage = useMessagesStore((state) => state.deleteMessage);
   const socket = useSocketStore((state) => state.socket);
+  const type = MessageData.contentType;
   useEffect(() => {
-    const mine = MyId === MessageData.fromId;
-    setmine(mine);
+    const isMine = MyId === MessageData.fromId;
+    setisMine(isMine);
   }, [MyId]);
-  const time = new Date(MessageData.createdAt).toLocaleTimeString([], {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
 
   return (
     <motion.div
@@ -51,187 +55,320 @@ export default function Message({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
       className={` max-h-72 w-fit relative group  shadow-2xl backdrop-blur-md shadow-gray-400 border-0  flex flex-col  rounded-2xl ${
-        MessageData.contentType === "image" && "h-auto "
+        type === "image" && "h-fit"
       }
         ${
-          mine
-            ? "ml-auto bg-blue-900   pr-3 pl-3 pb-1 pt-1.5  text-white "
+          isMine
+            ? `ml-auto bg-blue-900  ${
+                type === "image" ? "px-1 pt-1" : "pr-3 pl-3 pb-1 pt-1.5"
+              }     text-white `
             : " bg-blue-600 pl-2 pr-3 pb-1 pt-1  text-white mr-auto"
         }`}
     >
-      <div className="absolute  -left-12 top-1/2 transform -translate-y-1/2 z-10">
-        <DropdownMenu>
-          <DropdownMenuTrigger className="w-14 h-14 flex justify-center items-center cursor-pointer focus:outline-none focus:ring-0 focus:ring-offset-0 focus:bg-transparent">
-            <Ellipsis className="group-hover:text-black hover:scale-125 focus:text-black text-transparent duration-300 transition-all " />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent
-            side="left"
-            className={`rounded-2xl translate-x-1`}
-          >
-            <DropdownMenuItem
-              className={clsx("cursor-pointer", "rounded-2xl", {
-                hidden: MessageData.fromId !== MyId,
-              })}
-              onClick={async () => {
-                setDeleting(true);
-
-                try {
-                  await axios.delete("/api/message/delete", {
-                    data: {
-                      id: MessageData.id,
-                      publicId: MessageData.content,
-                      type: MessageData.contentType,
-                    },
-                  });
-
-                  deletedMessage(MessageData.id);
-                  setDeleting(false);
-                  socket?.emit("delete-message", {
-                    id: MessageData.id,
-                    roomId: MessageData.roomId,
-                  });
-                  toast.success("Message deleted successfully");
-                } catch (error) {
-                  setDeleting(false);
-
-                  toast.error(`${error}`);
-                  console.error("Delete failed:", error);
-                }
-              }}
-            >
-              Delete
-            </DropdownMenuItem>
-            {MessageData.contentType === "text" ||
-            MessageData.contentType === "link" ? (
-              <DropdownMenuItem
-                className={clsx("cursor-pointer", "rounded-2xl", {
-                  // hidden: MessageData.fromId !== MyId,
-                })}
-              >
-                Edit
-              </DropdownMenuItem>
-            ) : null}
-          </DropdownMenuContent>
-        </DropdownMenu>
+      <div
+        className={`absolute   ${
+          isMine
+            ? "-left-12 top-1/2 transform -translate-y-1/2"
+            : "-right-12 top-1/2 transform -translate-y-1/2"
+        }   z-10`}
+      >
+        <MessageOptions
+          MessageData={MessageData}
+          deleteMessage={deleteMessage}
+          setDeleting={setDeleting}
+          socket={socket}
+          MyId={MyId}
+          isMine={isMine}
+        />
       </div>
+
+      <div
+        className={`  overflow-hidden ${
+          type === "image" ? "rounded-2xl" : "rounded-none"
+        } `}
+      >
+        <div className="rounded-2xl">
+          <ImageContent
+            MessageData={MessageData}
+            imageloading={imageloading}
+            setImageloading={setImageloading}
+          />
+        </div>
+        <div className={`${isMine ? "self-end" : "self-start"} `}>
+          <LinkContent MessageData={MessageData} />
+          <TextContent MessageData={MessageData} isMine={isMine} />
+        </div>
+      </div>
+
+      <MessageFooter MessageData={MessageData} />
+    </motion.div>
+  );
+}
+
+// ---------------------------------------------------------------------
+function MessageFooter({ MessageData }: { MessageData: MessageType }) {
+  const time = new Date(MessageData.createdAt).toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+  return (
+    <div className="self-end flex items-center">
+      <div
+        className={`
+             "self-end" 
+            font-light text-xs text-[10px]`}
+      >
+        {time}
+      </div>
+      <div>
+        <MessageStatus status={`SENT`}></MessageStatus>
+      </div>
+    </div>
+  );
+}
+// ---------------------------------------------------------------------
+function BlobImagePreview({ MessageData }: { MessageData: MessageType }) {
+  return (
+    <img
+      width={300}
+      height={300}
+      loading="eager"
+      src={MessageData.content}
+      alt={MessageData.content || "Uploaded image"}
+      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 300px"
+      className="  shadow-sm blur-xs transition-all  hover:shadow-md"
+    />
+  );
+}
+// ---------------------------------------------------------------------------
+function LinkContent({ MessageData }: { MessageData: MessageType }) {
+  return (
+    <div>
+      <HoverCard>
+        <HoverCardTrigger>
+          {MessageData.contentType === "link" && (
+            <a
+              className="text-yellow-300  hover:underline underline-offset-5 break-all"
+              href={MessageData.content}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {MessageData.content}
+            </a>
+          )}
+        </HoverCardTrigger>
+        <HoverCardContent
+          defaultChecked
+          updatePositionStrategy="optimized"
+          className={` text-sm text-nowrap p-2 bg-white/70 backdrop-blur-lg rounded-2xl w-fit text-red-600`}
+        >
+          <span className="text-sm font-medium"> Caution: </span>
+          <span className="text-sm">
+            Only access links from verified friends
+          </span>
+        </HoverCardContent>
+      </HoverCard>
+    </div>
+  );
+}
+// ---------------------------------------------------------------------------
+function TextContent({
+  MessageData,
+  isMine,
+}: {
+  MessageData: MessageType;
+  isMine: boolean;
+}) {
+  return (
+    <div
+      className={`${
+        isMine ? "self-end" : "self-start"
+      } font-medium text-lg overflow-hidden rounded-2xl`}
+    >
+      {MessageData.contentType === "text" && (
+        <div className="break-words max-w-full">{MessageData.content}</div>
+      )}
+    </div>
+  );
+}
+// ---------------------------------------------------------------------------
+
+function ImageContent({
+  MessageData,
+  imageloading,
+  setImageloading,
+}: {
+  MessageData: MessageType;
+  imageloading: boolean;
+  setImageloading: any;
+}) {
+  return (
+    <div>
       {MessageData.contentType === "image" &&
         MessageData.content?.startsWith("blob:") && (
-          <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/10 rounded-2xl">
+          <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/10 ">
             <Spinner className="h-8 w-8 text-white" />
           </div>
         )}
-      <div
-        className={`${
-          mine ? "self-end" : "self-start"
-        }  font-medium text-lg overflow-hidden rounded-2xl`}
-      >
-        {MessageData.contentType === "link" && (
-          <a
-            className="text-gray-800  hover:underline underline-offset-2 break-all"
-            href={MessageData.content}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {MessageData.content}
-          </a>
-        )}
-        <div
-          className={`${
-            mine ? "self-end" : "self-start"
-          } font-medium text-lg overflow-hidden rounded-2xl`}
+      {MessageData.contentType === "image" ? (
+        MessageData.content?.startsWith("blob:") ? (
+          <BlobImagePreview MessageData={MessageData} />
+        ) : (
+          <ImagePreview
+            MessageData={MessageData}
+            imageloading={imageloading}
+            setImageloading={setImageloading}
+          />
+        )
+      ) : null}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+function ImagePreview({
+  MessageData,
+  imageloading,
+  setImageloading,
+}: {
+  MessageData: MessageType;
+  imageloading: boolean;
+  setImageloading: any;
+}) {
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <button
+          className="p-0 border-none bg-transparent cursor-pointer"
+          aria-label={`View ${MessageData.id || "image"} in fullscreen`}
         >
-          {MessageData.contentType === "text" && (
-            <div className="break-words max-w-full">{MessageData.content}</div>
-          )}
-        </div>
-        {MessageData.contentType === "image" ? (
-          MessageData.content?.startsWith("blob:") ? (
-            <img
-              width={300}
-              height={300}
-              src={MessageData.content}
-              alt={MessageData.content || "Uploaded image"}
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 300px"
-              className="rounded-2xl  shadow-sm blur-lg transition-all  hover:shadow-md"
-            />
-          ) : (
-            <Dialog>
-              <DialogTrigger asChild>
-                <button
-                  className="p-0 border-none bg-transparent cursor-pointer"
-                  aria-label={`View ${MessageData.id || "image"} in fullscreen`}
-                >
-                  <CldImage
-                    width={300}
-                    height={300}
-                    src={MessageData.content}
-                    alt={MessageData.content || "Uploaded image"}
-                    sizes="(max-width: 768px) 100vw, 300px"
-                    quality={60}
-                    crop="fit"
-                    loading="lazy"
-                    placeholder="empty"
-                    className="rounded-2xl shadow-sm transition-all hover:scale-105 hover:shadow-md"
-                  />
-                </button>
-              </DialogTrigger>
-              <DialogContent
-                className="[&>button:last-child]:hidden 
+          <CldImage
+            width={300}
+            height={300}
+            src={MessageData.content}
+            alt={MessageData.content || "Uploaded image"}
+            sizes="(max-width: 768px) 100vw, 300px"
+            quality={60}
+            crop="fit"
+            loading="lazy"
+            placeholder="empty"
+            className=" shadow-sm transition-all duration-500 hover:scale-105 hover:shadow-md"
+          />
+        </button>
+      </DialogTrigger>
+      <DialogContent
+        className="[&>button:last-child]:hidden 
                 !max-w-none !w-screen !h-screen fixed inset-0 z-50 bg-black/95
                 p-0 overflow-hidden flex items-center justify-center
                 "
-                onInteractOutside={(e) => e.preventDefault()}
-              >
-                <AnimatePresence>
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.5 }}
-                    transition={{ duration: 0.3, ease: easeIn }}
-                    className={`[&>button:last-child]:hidden 
+        onInteractOutside={(e) => e.preventDefault()}
+      >
+        <AnimatePresence>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.5 }}
+            transition={{ duration: 0.3, ease: easeIn }}
+            className={`[&>button:last-child]:hidden 
                   !max-w-none !w-screen !h-screen fixed inset-0 z-50 bg-black/95
                   p-0 overflow-hidden flex items-center justify-center`}
-                  >
-                    <DialogHeader className="sr-only hidden">
-                      <DialogTitle></DialogTitle>
-                    </DialogHeader>
-                    <div className="relative w-full h-full flex items-center justify-center">
-                      {imageloading && <Spinner size="lg" />}
-                      <CldImage
-                        fill
-                        priority
-                        src={MessageData.content}
-                        alt={MessageData.id || "Uploaded image"}
-                        quality={100}
-                        sizes="100vw"
-                        className="object-contain"
-                        draggable={false}
-                        onLoad={() => setImageloading(false)}
-                      />
+          >
+            <DialogHeader className="sr-only hidden">
+              <DialogTitle></DialogTitle>
+            </DialogHeader>
+            <div className="relative w-full h-full flex items-center justify-center">
+              {imageloading && <Spinner size="lg" />}
+              <CldImage
+                fill
+                priority
+                src={MessageData.content}
+                alt={MessageData.id || "Uploaded image"}
+                quality={100}
+                sizes="100vw"
+                className="object-contain"
+                draggable={false}
+                onLoad={() => setImageloading(false)}
+              />
 
-                      <DialogClose className="cursor-pointer absolute top-4 right-4 p-2 rounded-full bg-black/60 text-white hover:bg-black/80">
-                        <X className="w-8 h-8" />
-                      </DialogClose>
-                    </div>
-                  </motion.div>
-                </AnimatePresence>
-              </DialogContent>
-            </Dialog>
-          )
-        ) : null}
-      </div>
-      <div className="self-end flex items-center">
-        <div
-          className={`
-             "self-end" 
-            font-light text-xs text-[10px]`}
+              <DialogClose className="cursor-pointer absolute top-4 right-4 p-2 rounded-full bg-black/60 text-white hover:bg-black/80">
+                <X className="w-8 h-8" />
+              </DialogClose>
+            </div>
+          </motion.div>
+        </AnimatePresence>
+      </DialogContent>
+    </Dialog>
+  );
+}
+// -----------------------------------------------------------------
+function MessageOptions({
+  MessageData,
+  MyId,
+  socket,
+  setDeleting,
+  deleteMessage,
+  isMine,
+}: {
+  deleteMessage: any;
+  MessageData: MessageType;
+  MyId: string;
+  socket: Socket | null;
+  setDeleting: any;
+  isMine: boolean;
+}) {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger className="w-14 h-14 flex justify-center items-center cursor-pointer focus:outline-none focus:ring-0 focus:ring-offset-0 focus:bg-transparent">
+        <Ellipsis className="group-hover:text-black hover:scale-110 focus:text-black text-transparent duration-300 transition-all " />
+      </DropdownMenuTrigger>
+      <DropdownMenuContent
+        side={`${isMine ? "left" : "right"}`}
+        className={`rounded-2xl translate-x-1`}
+      >
+        <DropdownMenuItem
+          className={clsx("cursor-pointer", "rounded-2xl", {
+            hidden: MessageData.fromId !== MyId,
+          })}
+          onClick={async () => {
+            setDeleting(true);
+
+            try {
+              await axios.delete("/api/message/delete", {
+                data: {
+                  id: MessageData.id,
+                  publicId: MessageData.content,
+                  type: MessageData.contentType,
+                },
+              });
+
+              deleteMessage(MessageData.id);
+              setDeleting(false);
+              socket?.emit("delete-message", {
+                id: MessageData.id,
+                roomId: MessageData.roomId,
+              });
+              toast.success("Message deleted successfully");
+            } catch (error) {
+              setDeleting(false);
+
+              toast.error(`${error}`);
+              console.error("Delete failed:", error);
+            }
+          }}
         >
-          {time}
-        </div>
-        <div>
-          <MessageStatus status={`SENT`}></MessageStatus>
-        </div>
-      </div>
-    </motion.div>
+          Delete
+        </DropdownMenuItem>
+        {MessageData.contentType === "text" ||
+        MessageData.contentType === "link" ? (
+          <DropdownMenuItem
+            className={clsx("cursor-pointer", "rounded-2xl", {
+              // hidden: MessageData.fromId !== MyId,
+            })}
+          >
+            Edit
+          </DropdownMenuItem>
+        ) : null}
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
