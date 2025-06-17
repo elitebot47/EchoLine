@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@import "tw-animate-css";
 #chat-container {
   overflow-y: scroll;
   -webkit-overflow-scrolling: touch;

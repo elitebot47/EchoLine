@@ -46,7 +46,6 @@ const MyDropzone = ({
     if (!toId) {
       toast.error("Error:Connection error ,please try again later");
       toast.error("Error while uploading:Recipient id missing");
-      setUploading(false);
       setUploadbox(false);
       return;
     }
@@ -92,8 +91,10 @@ const MyDropzone = ({
           roomId,
           toId,
         } as MessageCreateInput);
+        console.log("res2.data:", res2.data);
+
         if (file?.id && res2?.data) {
-          replaceMessage(file.id, res2.data);
+          replaceMessage(file.id, res2.data.message);
         } else {
           console.error("Missing ID or message data", { file, res2 });
         }
@@ -105,7 +106,7 @@ const MyDropzone = ({
           });
         }
 
-        socket?.emit("Chat_client", res2.data);
+        socket?.emit("Chat_client", res2.data.message);
         setUploadedFiles([]);
       });
       (await Promise.all(uploadpromises)).filter(Boolean);
@@ -250,7 +251,7 @@ const MyDropzone = ({
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.5 }}
                     key={file.id}
-                    className="border border-gray-200 rounded-2xl p-1 flex h-fit  justify-center  flex-col items-center max-w-[200px] text-center bg-gray-50/50"
+                    className="border border-gray-200 rounded-2xl p-1 flex h-fit  justify-center max-w-[200px]  flex-col items-center  text-center bg-gray-50/50"
                   >
                     <div className="relative">
                       <Button
@@ -276,12 +277,12 @@ const MyDropzone = ({
                           <img
                             src={file.preview}
                             alt={file.id}
-                            className=" w-auto max-h-[250px]  h-fit  object-contain mb-1 rounded-2xl "
+                            className=" w-fit max-h-[250px]  h-fit  object-contain mb-1 rounded-2xl "
                           />
                         )}
                       </div>
                     </div>
-                    <span className="text-[8px] mx-auto break-all overflow-auto">
+                    <span className="text-[8px] break-all max-w-28  ">
                       {file.name}
                     </span>
                   </motion.li>

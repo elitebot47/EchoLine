@@ -2,7 +2,6 @@
 import { useMessagesStore } from "@/stores/MessagesStore";
 import { useSocketStore } from "@/stores/SocketStore";
 import type { MinimalMessage } from "@/types";
-import type { UUID } from "crypto";
 import { AnimatePresence, motion } from "motion/react";
 import { useSession } from "next-auth/react";
 import { useEffect, useRef } from "react";
@@ -21,7 +20,7 @@ export default function ChatViewArea({
   const messages = useMessagesStore((state) => state.messages);
   const addMessage = useMessagesStore((state) => state.addMessage);
   const setMessages = useMessagesStore((state) => state.setMessages);
-  const deletedMessage = useMessagesStore((state) => state.deleteMessage);
+  const deleteMessage = useMessagesStore((state) => state.deleteMessage);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     setMessages(Messages?.filter(Boolean) ?? []);
@@ -38,8 +37,10 @@ export default function ChatViewArea({
   useEffect(() => {
     if (!socket) return;
     const handler = (data: any) => {
-      if (data.message) {
-        addMessage(data.message);
+      if (data) {
+        console.log("data", data);
+
+        addMessage(data);
       }
     };
     socket.on("BroadToMembers", handler);
@@ -49,16 +50,16 @@ export default function ChatViewArea({
   }, [socket, addMessage]);
   useEffect(() => {
     if (!socket) return;
-    const handler = (data: { id: UUID; roomId: UUID }) => {
+    const handler = (data: { id: string; roomId: string }) => {
       if (data.id) {
-        deletedMessage(data.id);
+        deleteMessage(data.id);
       }
     };
     socket.on("delete-message-action", handler);
     return () => {
       socket.off("delete-message-action", handler);
     };
-  }, [socket, deletedMessage]);
+  }, [socket, deleteMessage]);
   useEffect(() => {
     scroll.scrollToBottom({
       containerId: "chat-container",
@@ -87,16 +88,10 @@ export default function ChatViewArea({
           )}
           <AnimatePresence>
             {messages
-              ?.filter(
-                (message) => message?.content && message.content.trim() !== ""
-              )
-              .map((message, index) => {
-                const key = message.id
-                  ? message.id
-                  : `${message.createdAt}-${index}`;
-
+              ?.filter((message) => message?.content?.trim())
+              .map((message) => {
                 return (
-                  <motion.div key={key}>
+                  <motion.div key={message.id}>
                     <Message
                       MessageData={message}
                       MyId={session?.user?.id || ""}

@@ -48,22 +48,16 @@ export default function Message({
     const isMine = MyId === MessageData.fromId;
     setisMine(isMine);
   }, [MyId]);
+  console.log(MessageData);
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
-      className={` max-h-72 w-fit relative group  shadow-2xl backdrop-blur-md shadow-gray-400 border-0  flex flex-col  rounded-2xl ${
-        type === "image" && "h-fit"
-      }
-        ${
-          isMine
-            ? `ml-auto bg-blue-900  ${
-                type === "image" ? "px-1 pt-1" : "pr-3 pl-3 pb-1 pt-1.5"
-              }     text-white `
-            : " bg-blue-600 pl-2 pr-3 pb-1 pt-1  text-white mr-auto"
-        }`}
+      className={`max-h-72 w-fit max-w-md relative group shadow-lg backdrop-blur-md shadow-gray-400 border-0 flex flex-col rounded-2xl
+    ${type === "image" ? "p-1" : "px-3 py-1.5"}
+    ${isMine ? "ml-auto " : "mr-auto "}`}
     >
       <div
         className={`absolute   ${
@@ -87,13 +81,11 @@ export default function Message({
           type === "image" ? "rounded-2xl" : "rounded-none"
         } `}
       >
-        <div className="rounded-2xl">
-          <ImageContent
-            MessageData={MessageData}
-            imageloading={imageloading}
-            setImageloading={setImageloading}
-          />
-        </div>
+        <ImageContent
+          MessageData={MessageData}
+          imageloading={imageloading}
+          setImageloading={setImageloading}
+        />
         <div className={`${isMine ? "self-end" : "self-start"} `}>
           <LinkContent MessageData={MessageData} />
           <TextContent MessageData={MessageData} isMine={isMine} />
@@ -144,11 +136,11 @@ function BlobImagePreview({ MessageData }: { MessageData: MessageType }) {
 function LinkContent({ MessageData }: { MessageData: MessageType }) {
   return (
     <div>
-      <HoverCard>
-        <HoverCardTrigger>
+      <HoverCard openDelay={50}>
+        <HoverCardTrigger asChild>
           {MessageData.contentType === "link" && (
             <a
-              className="text-yellow-300  hover:underline underline-offset-5 break-all"
+              className="text-green-700  hover:underline underline-offset-5 break-all"
               href={MessageData.content}
               target="_blank"
               rel="noopener noreferrer"
@@ -158,14 +150,10 @@ function LinkContent({ MessageData }: { MessageData: MessageType }) {
           )}
         </HoverCardTrigger>
         <HoverCardContent
-          defaultChecked
-          updatePositionStrategy="optimized"
-          className={` text-sm text-nowrap p-2 bg-white/70 backdrop-blur-lg rounded-2xl w-fit text-red-600`}
+          className={` text-sm m-1 text-nowrap p-2 bg-black/70 backdrop-blur-lg rounded-lg w-fit text-red-500`}
         >
           <span className="text-sm font-medium"> Caution: </span>
-          <span className="text-sm">
-            Only access links from verified friends
-          </span>
+          <span className="text-sm">Link can be malicious</span>
         </HoverCardContent>
       </HoverCard>
     </div>
@@ -183,7 +171,7 @@ function TextContent({
     <div
       className={`${
         isMine ? "self-end" : "self-start"
-      } font-medium text-lg overflow-hidden rounded-2xl`}
+      } font-medium text-lg overflow-hidden `}
     >
       {MessageData.contentType === "text" && (
         <div className="break-words max-w-full">{MessageData.content}</div>
@@ -206,7 +194,7 @@ function ImageContent({
     <div>
       {MessageData.contentType === "image" &&
         MessageData.content?.startsWith("blob:") && (
-          <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/10 ">
+          <div className="absolute inset-0 z-20 flex rounded-2xl items-center justify-center  ">
             <Spinner className="h-8 w-8 text-white" />
           </div>
         )}
@@ -238,30 +226,24 @@ function ImagePreview({
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <button
-          className="p-0 border-none bg-transparent cursor-pointer"
-          aria-label={`View ${MessageData.id || "image"} in fullscreen`}
-        >
-          <CldImage
-            width={300}
-            height={300}
-            src={MessageData.content}
-            alt={MessageData.content || "Uploaded image"}
-            sizes="(max-width: 768px) 100vw, 300px"
-            quality={60}
-            crop="fit"
-            loading="lazy"
-            placeholder="empty"
-            className=" shadow-sm transition-all duration-500 hover:scale-105 hover:shadow-md"
-          />
-        </button>
+        <CldImage
+          width={300}
+          height={300}
+          src={MessageData.content}
+          alt={MessageData.content || "Uploaded image"}
+          sizes="(max-width: 768px) 100vw, 300px"
+          quality={60}
+          crop="fit"
+          loading="lazy"
+          placeholder="empty"
+          className=" shadow-sm transition-all duration-500 hover:scale-105 hover:shadow-md"
+        />
       </DialogTrigger>
       <DialogContent
         className="[&>button:last-child]:hidden 
                 !max-w-none !w-screen !h-screen fixed inset-0 z-50 bg-black/95
                 p-0 overflow-hidden flex items-center justify-center
                 "
-        onInteractOutside={(e) => e.preventDefault()}
       >
         <AnimatePresence>
           <motion.div
@@ -331,17 +313,20 @@ function MessageOptions({
           })}
           onClick={async () => {
             setDeleting(true);
+            console.log("messageId before deleting fro db-", {
+              id: MessageData.id,
+              type: MessageData.contentType,
+            });
 
             try {
-              await axios.delete("/api/message/delete", {
+              const res = await axios.delete("/api/message/delete", {
                 data: {
                   id: MessageData.id,
-                  publicId: MessageData.content,
                   type: MessageData.contentType,
                 },
               });
 
-              deleteMessage(MessageData.id);
+              deleteMessage(res.data.messageId);
               setDeleting(false);
               socket?.emit("delete-message", {
                 id: MessageData.id,

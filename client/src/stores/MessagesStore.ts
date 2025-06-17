@@ -21,12 +21,14 @@ export const useMessagesStore = create<MessagesStoreType>((set) => ({
     }));
   },
   replaceMessage: (id, newMessage) =>
-    set((state) => ({
-      messages: (state.messages || [])
-        .filter((msg) => msg?.content && msg.id)
-        .map((msg) => (msg.id === id ? newMessage : msg))
-        .filter(Boolean),
-    })),
+    set((state) => {
+      const messages = state.messages || [];
+      return {
+        messages: messages.map((msg) =>
+          msg.id === id ? { ...msg, ...newMessage } : msg
+        ),
+      };
+    }),
   deleteMessage: (id) =>
     set((state) => ({
       messages: state.messages?.filter((message) => message.id !== id),

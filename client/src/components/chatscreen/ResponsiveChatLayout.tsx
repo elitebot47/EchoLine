@@ -75,7 +75,7 @@ export default function ResponsiveChatLayout({
           key={"chat-view-screen"}
           className={`
           ${showChat ? "block" : "hidden"} 
-          lg:block w-full lg:w-2/3 h-full
+          lg:block overflow-hidden w-full lg:w-2/3 h-full
           `}
         >
           {children}

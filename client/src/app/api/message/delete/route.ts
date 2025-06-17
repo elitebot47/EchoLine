@@ -25,14 +25,20 @@ export async function DELETE(req: NextRequest) {
       {
         success: true,
         message: "Message deleted successfully",
+        messageId: deletedMessage.id,
       },
       { status: 200 }
     );
+    console.log("dleted content:", deletedMessage.content);
 
-    if (type === "image") {
-      cloudinary.uploader
-        .destroy(deletedMessage.content, { invalidate: true })
-        .catch((error) => console.error("Cloudinary cleanup failed:", error));
+    if (type === "image" && deletedMessage.content) {
+      try {
+        await cloudinary.uploader.destroy(deletedMessage.content, {
+          invalidate: true,
+        });
+      } catch (cloudinaryError) {
+        console.error("Cloudinary cleanup failed:", cloudinaryError);
+      }
     }
 
     return response;
