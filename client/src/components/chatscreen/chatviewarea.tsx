@@ -38,8 +38,6 @@ export default function ChatViewArea({
     if (!socket) return;
     const handler = (data: any) => {
       if (data) {
-        console.log("data", data);
-
         addMessage(data);
       }
     };

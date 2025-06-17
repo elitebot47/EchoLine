@@ -17,6 +17,9 @@ export type MinimalMessage = Pick<
   | "content"
   | "contentType"
   | "updatedAt"
+  | "fileName"
+  | "fileSize"
+  | "fileType"
 >;
 export type StatusType = "SENDING" | "SENT" | "DELIVERED" | "READ";
 
@@ -25,9 +28,9 @@ export type MessageType = {
   from: string;
   to: string;
   toId: string;
-  fileName?: string;
-  fileSize?: number;
-  fileType?: string;
+  fileName?: string | null;
+  fileSize?: number | null;
+  fileType?: string | null;
   fromId: string;
   room: RoomType;
   createdAt: Date;

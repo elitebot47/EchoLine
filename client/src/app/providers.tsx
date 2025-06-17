@@ -30,7 +30,7 @@ export default function Providers({
     <QueryClientProvider client={queryClient}>
       <SessionProvider session={session}>
         {children}
-        <Toaster position="top-center" />
+        <Toaster richColors closeButton position="top-center" />
       </SessionProvider>
     </QueryClientProvider>
   );

@@ -78,7 +78,10 @@ export default function AccessibilityCard({ users }: { users: MinimalUser[] }) {
             transition={{ duration: 0.1 }}
           >
             <DropdownMenu>
-              <DropdownMenuTrigger className=" cursor-pointer [&[data-state=open]]:bg-transparent focus:ring-0 focus:ring-offset-0 ring-0 flex justify-center items-center ">
+              <DropdownMenuTrigger
+                asChild
+                className=" cursor-pointer [&[data-state=open]]:bg-transparent focus:ring-0 focus:ring-offset-0 ring-0 flex justify-center items-center "
+              >
                 <MenuIcon className="hover:scale-110 duration-500" size={35} />
               </DropdownMenuTrigger>
               <DropdownMenuContent className="border-2  border-white/20 bg-white/30 backdrop-blur-lg shadow-2xl ">

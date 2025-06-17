@@ -35,6 +35,9 @@ export async function POST(req: NextRequest) {
         toId: true,
         roomId: true,
         contentType: true,
+        fileName: true,
+        fileSize: true,
+        fileType: true,
       },
     });
     console.log("isFirstMessage", isFirstMessage);

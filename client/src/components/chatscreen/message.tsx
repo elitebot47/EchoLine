@@ -24,7 +24,7 @@ import type { MessageType } from "@/types";
 import axios from "axios";
 import clsx from "clsx";
 import { AnimatePresence, easeIn, motion } from "framer-motion";
-import { Ellipsis, X } from "lucide-react";
+import { Ellipsis, FileDown, X } from "lucide-react";
 import { CldImage } from "next-cloudinary";
 import { useEffect, useState } from "react";
 import type { Socket } from "socket.io-client";
@@ -48,16 +48,18 @@ export default function Message({
     const isMine = MyId === MessageData.fromId;
     setisMine(isMine);
   }, [MyId]);
-  console.log(MessageData);
+  console.log("MessageData", MessageData);
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
-      className={`max-h-72 w-fit max-w-md relative group shadow-lg backdrop-blur-md shadow-gray-400 border-0 flex flex-col rounded-2xl
-    ${type === "image" ? "p-1" : "px-3 py-1.5"}
-    ${isMine ? "ml-auto " : "mr-auto "}`}
+      className={`max-h-72 ${
+        deleting ? "  blur-[3px] cursor-not-allowed pointer-events-none " : ""
+      } w-fit  relative group shadow-lg backdrop-blur-md shadow-gray-400 border-0 flex flex-col rounded-2xl
+    ${type === "image" ? "p-1" : "px-2 py-1"}
+    ${isMine ? "ml-auto rounded-br-none" : "mr-auto rounded-bl-none"}`}
     >
       <div
         className={`absolute   ${
@@ -81,6 +83,7 @@ export default function Message({
           type === "image" ? "rounded-2xl" : "rounded-none"
         } `}
       >
+        <DocumentContent MessageData={MessageData} />
         <ImageContent
           MessageData={MessageData}
           imageloading={imageloading}
@@ -104,7 +107,7 @@ function MessageFooter({ MessageData }: { MessageData: MessageType }) {
     minute: "2-digit",
   });
   return (
-    <div className="self-end flex items-center">
+    <div className=" self-end flex h-2 mt-1  items-center">
       <div
         className={`
              "self-end" 
@@ -119,6 +122,32 @@ function MessageFooter({ MessageData }: { MessageData: MessageType }) {
   );
 }
 // ---------------------------------------------------------------------
+function DocumentContent({ MessageData }: { MessageData: MessageType }) {
+  return (
+    <div className={`  overflow-hidden `}>
+      {MessageData.contentType === "document" && (
+        <div className=" flex items-center mr-2 ">
+          <a
+            className="hover:scale-105 duration-500 hover:text-red-700 flex items-center  "
+            href={`https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/raw/upload/${MessageData.content}`}
+          >
+            <div>
+              <FileDown className="size-10" />
+            </div>
+          </a>
+          <div className={`flex flex-col`}>
+            <div className={`mr-1.5 text-lg`}>{MessageData.fileName}</div>
+            {MessageData.fileSize && (
+              <div className={`text-xs`}>
+                {(MessageData.fileSize / (1024 * 1024)).toFixed(2)}MB
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 function BlobImagePreview({ MessageData }: { MessageData: MessageType }) {
   return (
     <img
@@ -171,7 +200,7 @@ function TextContent({
     <div
       className={`${
         isMine ? "self-end" : "self-start"
-      } font-medium text-lg overflow-hidden `}
+      } font-medium text-2xl overflow-hidden `}
     >
       {MessageData.contentType === "text" && (
         <div className="break-words max-w-full">{MessageData.content}</div>
@@ -236,7 +265,7 @@ function ImagePreview({
           crop="fit"
           loading="lazy"
           placeholder="empty"
-          className=" shadow-sm transition-all duration-500 hover:scale-105 hover:shadow-md"
+          className=" shadow-sm transition-all duration-500 cursor-zoom-in hover:scale-105 hover:shadow-md"
         />
       </DialogTrigger>
       <DialogContent
@@ -313,10 +342,6 @@ function MessageOptions({
           })}
           onClick={async () => {
             setDeleting(true);
-            console.log("messageId before deleting fro db-", {
-              id: MessageData.id,
-              type: MessageData.contentType,
-            });
 
             try {
               const res = await axios.delete("/api/message/delete", {

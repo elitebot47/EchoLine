@@ -31,6 +31,16 @@ export async function DELETE(req: NextRequest) {
     );
     console.log("dleted content:", deletedMessage.content);
 
+    if (type === "document" && deletedMessage.content) {
+      try {
+        await cloudinary.uploader.destroy(deletedMessage.content, {
+          invalidate: true,
+          resource_type: "raw",
+        });
+      } catch (cloudinaryError) {
+        console.error("Cloudinary cleanup failed:", cloudinaryError);
+      }
+    }
     if (type === "image" && deletedMessage.content) {
       try {
         await cloudinary.uploader.destroy(deletedMessage.content, {

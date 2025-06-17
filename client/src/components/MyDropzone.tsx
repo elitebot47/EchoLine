@@ -1,5 +1,4 @@
 // src/components/MyDropzone.tsx
-import type { MessageCreateInput } from "@/lib/schemas/message";
 import { useMessagesStore } from "@/stores/MessagesStore";
 import { useSocketStore } from "@/stores/SocketStore";
 import { useQueryClient } from "@tanstack/react-query";
@@ -51,8 +50,8 @@ const MyDropzone = ({
     }
     try {
       const uploadpromises = Array.from(uploadedFiles).map(async (file) => {
-        const formData = new FormData();
         if (!session?.user?.id) return;
+        const formData = new FormData();
 
         if (!file.preview) {
           return;
@@ -70,33 +69,69 @@ const MyDropzone = ({
           formData.append("upload_preset", upload_preset);
           filetype = "image";
         }
+        if (file.type.includes("application/") || file.type.includes("text/")) {
+          const upload_preset =
+            process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET_ROOM_DOCUMENT;
+          if (!upload_preset) {
+            toast.error("Error: upload_preset missing!");
+            return;
+          }
 
-        addMessage({
-          id: file.id,
-          toId,
-          roomId,
-          fromId: session?.user?.id,
-          content: file.preview,
-          contentType: "image",
-          updatedAt: new Date(),
-          createdAt: new Date(),
-        });
+          formData.append("file", file);
+          formData.append("upload_preset", upload_preset);
+          filetype = "document";
+
+          for (const [key, value] of formData.entries()) {
+            console.log(key, value);
+          }
+        }
+        if (filetype === "image") {
+          addMessage({
+            id: file.id,
+            toId,
+            roomId,
+            fromId: session?.user?.id,
+            content: file.preview,
+            contentType: filetype,
+            updatedAt: new Date(),
+            createdAt: new Date(),
+          });
+        }
 
         setUploadbox(false);
-        const res1 = await axios.post(`/api/fileupload/image`, formData);
+        console.log("filetype:", filetype);
+
+        const res1 = await axios.post(`/api/fileupload/${filetype}`, formData);
+        console.log("res1:", res1.data);
 
         const res2 = await axios.post("/api/message/add", {
           content: res1.data.public_id,
           contentType: filetype,
           roomId,
           toId,
-        } as MessageCreateInput);
-        console.log("res2.data:", res2.data);
+          fileName: file.name,
+          fileSize: file.size,
+          fileType: file.type,
+        });
 
-        if (file?.id && res2?.data) {
+        console.log("res2.data:", res2.data);
+        if (file?.id && res2?.data && filetype === "document") {
+          addMessage({
+            id: res2.data.message.id,
+            toId,
+            roomId,
+            fromId: session?.user?.id,
+            content: res2.data.message.content,
+            contentType: "document",
+            updatedAt: new Date(),
+            createdAt: new Date(),
+            fileName: file.name,
+            fileSize: file.size,
+            fileType: file.type,
+          });
+        }
+        if (file?.id && res2?.data && filetype === "image") {
           replaceMessage(file.id, res2.data.message);
-        } else {
-          console.error("Missing ID or message data", { file, res2 });
         }
         if (res2.data.isFirstMessage) {
           queryClient.invalidateQueries({
@@ -171,6 +206,11 @@ const MyDropzone = ({
     accept: {
       "image/jpeg": [".jpeg", ".jpg"],
       "image/png": [".png"],
+      "application/pdf": [".pdf"],
+      "application/msword": [".doc"],
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+        [".docx"],
+      "text/plain": [".txt"],
     },
   });
 
@@ -213,18 +253,18 @@ const MyDropzone = ({
             )}
             {isDragAccept && (
               <p className="text-green-500 mt-2">
-                Only photos will be accepted!
+                Only photos & documents will be accepted!
               </p>
             )}
             {isDragReject && (
               <p className="text-red-500 mt-2">
-                Audio,videos,documents will be rejected!
+                Audio,videos will be rejected!
               </p>
             )}
           </motion.div>
 
           {fileRejections.length > 0 && (
-            <div className="mt-5 text-red-500">
+            <div className="mt-5 text-red-800">
               <h4 className="font-bold text-lg mb-2">Rejected Files:</h4>
               <ul className="list-none p-0">
                 {fileRejections.map(({ file, errors }) => (
@@ -280,11 +320,20 @@ const MyDropzone = ({
                             className=" w-fit max-h-[250px]  h-fit  object-contain mb-1 rounded-2xl "
                           />
                         )}
+                        {(file.type.startsWith("application/") ||
+                          file.type.startsWith("text/")) && (
+                          <div className="w-28 text-xs">
+                            <div className="text-3xl">📝</div>
+                            <div className="break-all">{file.name}</div>
+                          </div>
+                        )}
                       </div>
                     </div>
-                    <span className="text-[8px] break-all max-w-28  ">
-                      {file.name}
-                    </span>
+                    {file.type.startsWith("image/") && (
+                      <span className="text-[8px] break-all max-w-28  ">
+                        {file.name}
+                      </span>
+                    )}
                   </motion.li>
                 ))}
               </ul>
