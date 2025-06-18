@@ -4,10 +4,10 @@ import { Server } from "socket.io";
 
 const app = express();
 const server = http.createServer(app);
-const port = 3001;
 const io = new Server(server, {
   cors: {
-    origin: "*",
+    origin: "https://chat-app-roan-psi.vercel.app/",
+    methods: ["GET", "POST"],
   },
 });
 
@@ -32,6 +32,8 @@ io.on("connection", (socket) => {
     socket.leave(data);
   });
 });
+const port = Number(process.env.PORT) || 3001;
+
 server.listen(port, "0.0.0.0", () => {
   console.log(`server listening on ${port}`);
 });

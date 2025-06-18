@@ -5,11 +5,10 @@ type SocketStoreType = {
   socket: Socket | null;
   initializesocket: () => void;
 };
-const port = 3001;
 export const useSocketStore = create<SocketStoreType>((set) => ({
   socket: null,
   initializesocket: () => {
-    const socketinstance = io("http://192.168.1.4:3001", {
+    const socketinstance = io(process.env.NEXT_PUBLIC_SOCKET_URL, {
       transports: ["websocket"],
     });
     set({ socket: socketinstance });
