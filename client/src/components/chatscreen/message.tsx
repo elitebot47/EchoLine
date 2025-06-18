@@ -95,7 +95,7 @@ export default function Message({
         </div>
       </div>
 
-      <MessageFooter socket={socket} MessageData={MessageData} />
+      <MessageFooter MessageData={MessageData} />
     </motion.div>
   );
 }
@@ -103,10 +103,10 @@ export default function Message({
 // ---------------------------------------------------------------------
 function MessageFooter({
   MessageData,
-  socket,
-}: {
+}: // socket,
+{
   MessageData: MessageType;
-  socket: Socket;
+  // socket: Socket;
 }) {
   const time = new Date().toLocaleTimeString([], {
     hour: "2-digit",
