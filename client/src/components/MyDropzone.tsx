@@ -229,7 +229,7 @@ const MyDropzone = ({
               <div className="flex flex-col">
                 <div>Drag files here, or click to select files</div>
                 <div className="text-red-700 text-2xl justify-center items-center flex">
-                  Photos only
+                  Photos and Documents only
                 </div>
               </div>
             )}

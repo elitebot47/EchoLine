@@ -23,7 +23,7 @@ export function MessageStatus({
       {status === "DELIVERED" && (
         <span className="flex">
           <Check className="w-3 h-3" />
-          <Check className="w-3 h-3 -ml-1" />
+          <Check className="w-3 h-3 -ml-2" />
         </span>
       )}
       {status === "READ" && (

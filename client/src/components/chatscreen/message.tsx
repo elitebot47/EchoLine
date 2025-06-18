@@ -55,11 +55,15 @@ export default function Message({
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
-      className={`max-h-72 ${
+      className={`lg:max-h-72 max-h-64 ${
         deleting ? "  blur-[3px] cursor-not-allowed pointer-events-none " : ""
       } w-fit  relative group shadow-lg backdrop-blur-md shadow-gray-400 border-0 flex flex-col rounded-2xl
-    ${type === "image" ? "p-1" : "px-2 py-1"}
-    ${isMine ? "ml-auto rounded-br-none" : "mr-auto rounded-bl-none"}`}
+    ${type === "image" ? "p-1" : "px-2 py-2"}
+    ${
+      isMine
+        ? "ml-auto rounded-br-none bg-black/80 text-white"
+        : "mr-auto rounded-bl-none"
+    }`}
     >
       <div
         className={`absolute   ${
@@ -130,7 +134,7 @@ function MessageFooter({}: // MessageData,
         {time}
       </div>
       <div>
-        <MessageStatus status={`SENDING`}></MessageStatus>
+        <MessageStatus status={`DELIVERED`}></MessageStatus>
       </div>
     </div>
   );
