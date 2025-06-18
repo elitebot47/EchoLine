@@ -43,7 +43,7 @@ export default function ResponsiveChatLayout({
             exit={{ opacity: 0, y: -50 }}
             transition={{ duration: 0.3 }}
             key={"mobile-banner"}
-            className={`p-2 z-50 flex absolute w-screen h-16 bg-red-600/50
+            className={`p-2 z-50 flex absolute w-screen h-fit bg-red-600/50
             
             backdrop-blur-lg items-center justify-center`}
           >

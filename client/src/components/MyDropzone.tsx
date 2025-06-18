@@ -208,7 +208,7 @@ const MyDropzone = ({
         <motion.div
           layout="size"
           transition={{ duration: 0.2 }}
-          className="font-sans  max-h-[500px]   w-full max-w-[900px] min-w-[500px]  overflow-hidden   rounded-2xl"
+          className="  lg:max-h-[500px]  min-w-[90vw] w-full lg:max-w-[900px] lg:min-w-[600px]  overflow-hidden   rounded-2xl"
         >
           <motion.div
             key={`upload-view-area`}
@@ -273,7 +273,7 @@ const MyDropzone = ({
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.5 }}
                     key={file.id}
-                    className="border border-gray-200 rounded-2xl p-1 flex h-fit  justify-center max-w-[200px]  flex-col items-center  text-center bg-gray-50/50"
+                    className="border border-gray-200 rounded-2xl p-1 flex h-fit  justify-center lg:max-w-[200px] max-w-[85px] flex-col items-center  text-center bg-gray-50/50"
                   >
                     <div className="relative">
                       <Button
@@ -304,7 +304,7 @@ const MyDropzone = ({
                         )}
                         {(file.type.startsWith("application/") ||
                           file.type.startsWith("text/")) && (
-                          <div className="w-28 text-xs">
+                          <div className="lg:w-28 w-fit text-xs">
                             <div className="text-3xl">📝</div>
                             <div className="break-all">{file.name}</div>
                           </div>
