@@ -17,7 +17,6 @@ export default function SignUpPage() {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [loader, setLoader] = useState(false);
-  const [Googleloader, setGoogleloader] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/";
