@@ -208,7 +208,7 @@ const MyDropzone = ({
         <motion.div
           layout="size"
           transition={{ duration: 0.2 }}
-          className="  lg:max-h-[500px]  min-w-[90vw] w-full lg:max-w-[900px] lg:min-w-[600px]  overflow-hidden   rounded-2xl"
+          className="  lg:max-h-[500px]  max-w-[90vw] w-full lg:max-w-[900px] lg:min-w-[600px]  overflow-hidden   rounded-2xl"
         >
           <motion.div
             key={`upload-view-area`}

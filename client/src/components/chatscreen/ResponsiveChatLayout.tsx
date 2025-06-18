@@ -48,7 +48,7 @@ export default function ResponsiveChatLayout({
             backdrop-blur-lg items-center justify-center`}
           >
             <div className="self-center text-center text-xl">
-              For better experience please user larger devices like laptop or
+              For better experience please use larger devices like laptop or
               computer
             </div>
             <div className={`mr-auto`}>

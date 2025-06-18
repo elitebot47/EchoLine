@@ -55,9 +55,9 @@ export default function Message({
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
-      className={`lg:max-h-72 max-h-64 ${
+      className={`lg:max-h-72 max-h-64  ${
         deleting ? "  blur-[3px] cursor-not-allowed pointer-events-none " : ""
-      } w-fit  relative group shadow-lg backdrop-blur-md shadow-gray-400 border-0 flex flex-col rounded-2xl
+      } w-fit max-w-60 lg:max-w-[60%]  relative group shadow-lg backdrop-blur-md shadow-gray-400 border-0 flex flex-col rounded-2xl
     ${type === "image" ? "p-1" : "px-2 py-2"}
     ${
       isMine
@@ -144,7 +144,7 @@ function DocumentContent({ MessageData }: { MessageData: MessageType }) {
   return (
     <div className={`  overflow-hidden `}>
       {MessageData.contentType === "document" && (
-        <div className=" flex items-center mr-2 ">
+        <div className=" flex items-center gap-1.5 ">
           <a
             className="hover:scale-105 duration-500 hover:text-red-700 flex items-center  "
             href={`https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/raw/upload/${MessageData.content}`}
@@ -154,7 +154,7 @@ function DocumentContent({ MessageData }: { MessageData: MessageType }) {
             </div>
           </a>
           <div className={`flex flex-col`}>
-            <div className={`mr-1.5 text-lg`}>{MessageData.fileName}</div>
+            <div className={`mr-1.5 text-sm  `}>{MessageData.fileName}</div>
             {MessageData.fileSize && (
               <div className={`text-xs`}>
                 {(MessageData.fileSize / (1024 * 1024)).toFixed(2)}MB
@@ -221,7 +221,7 @@ function TextContent({
       } font-medium text-2xl overflow-hidden `}
     >
       {MessageData.contentType === "text" && (
-        <div className="break-words max-w-full">{MessageData.content}</div>
+        <div className="break-words ">{MessageData.content}</div>
       )}
     </div>
   );
