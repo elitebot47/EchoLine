@@ -95,17 +95,32 @@ export default function Message({
         </div>
       </div>
 
-      <MessageFooter MessageData={MessageData} />
+      <MessageFooter socket={socket} MessageData={MessageData} />
     </motion.div>
   );
 }
 
 // ---------------------------------------------------------------------
-function MessageFooter({ MessageData }: { MessageData: MessageType }) {
-  const time = new Date(MessageData.createdAt).toLocaleTimeString([], {
+function MessageFooter({
+  MessageData,
+  socket,
+}: {
+  MessageData: MessageType;
+  socket: Socket;
+}) {
+  const time = new Date().toLocaleTimeString([], {
     hour: "2-digit",
     minute: "2-digit",
   });
+  // const statusUpdatehandler = (data) => {
+
+  // };
+  // useEffect(() => {
+  //   socket.on(`message-status`, statusUpdatehandler);
+  //   return () => {
+  //     socket.off(`message-status`, statusUpdatehandler);
+  //   };
+  // }, [socket]);
   return (
     <div className=" self-end flex h-2 mt-1  items-center">
       <div
@@ -116,7 +131,7 @@ function MessageFooter({ MessageData }: { MessageData: MessageType }) {
         {time}
       </div>
       <div>
-        <MessageStatus status={`SENT`}></MessageStatus>
+        <MessageStatus status={`SENDING`}></MessageStatus>
       </div>
     </div>
   );
