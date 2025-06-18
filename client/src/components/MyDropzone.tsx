@@ -1,6 +1,7 @@
 // src/components/MyDropzone.tsx
 import { useMessagesStore } from "@/stores/MessagesStore";
 import { useSocketStore } from "@/stores/SocketStore";
+import type { Filetype } from "@/types";
 import { useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { AnimatePresence, motion } from "framer-motion";
@@ -43,48 +44,35 @@ const MyDropzone = ({
     setUploading(true);
 
     if (!toId) {
-      toast.error("Error:Connection error ,please try again later");
-      toast.error("Error while uploading:Recipient id missing");
+      console.log("Error while uploading:Recipient id missing");
+
       setUploadbox(false);
       return;
     }
     try {
+      const uploadPresets: Record<Filetype, string> = {
+        image: process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET_ROOM_IMAGE!,
+        document:
+          process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET_ROOM_DOCUMENT!,
+      };
       const uploadpromises = Array.from(uploadedFiles).map(async (file) => {
         if (!session?.user?.id) return;
         const formData = new FormData();
+        formData.append("file", file);
 
-        if (!file.preview) {
-          return;
-        }
-        let filetype;
+        let filetype: Filetype;
 
-        if (file.type.includes("image")) {
-          const upload_preset =
-            process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET_ROOM_IMAGE;
-          if (!upload_preset) {
-            toast.error("Error: upload_preset missing!");
-            return;
-          }
-          formData.append("file", file);
-          formData.append("upload_preset", upload_preset);
+        if (file.type.startsWith("image/")) {
+          filetype = "image";
+        } else if (
+          file.type.startsWith("application/") ||
+          file.type.startsWith("text/")
+        ) {
+          filetype = "document";
+        } else {
           filetype = "image";
         }
-        if (file.type.includes("application/") || file.type.includes("text/")) {
-          const upload_preset =
-            process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET_ROOM_DOCUMENT;
-          if (!upload_preset) {
-            toast.error("Error: upload_preset missing!");
-            return;
-          }
-
-          formData.append("file", file);
-          formData.append("upload_preset", upload_preset);
-          filetype = "document";
-
-          for (const [key, value] of formData.entries()) {
-            console.log(key, value);
-          }
-        }
+        formData.append("upload_preset", uploadPresets[filetype]);
         if (filetype === "image") {
           addMessage({
             id: file.id,
@@ -99,10 +87,8 @@ const MyDropzone = ({
         }
 
         setUploadbox(false);
-        console.log("filetype:", filetype);
 
-        const res1 = await axios.post(`/api/fileupload/${filetype}`, formData);
-        console.log("res1:", res1.data);
+        const res1 = await axios.post(`/api/fileupload`, formData);
 
         const res2 = await axios.post("/api/message/add", {
           content: res1.data.public_id,
@@ -114,8 +100,7 @@ const MyDropzone = ({
           fileType: file.type,
         });
 
-        console.log("res2.data:", res2.data);
-        if (file?.id && res2?.data && filetype === "document") {
+        if (filetype === "document") {
           addMessage({
             id: res2.data.message.id,
             toId,
@@ -130,9 +115,7 @@ const MyDropzone = ({
             fileType: file.type,
           });
         }
-        if (file?.id && res2?.data && filetype === "image") {
-          replaceMessage(file.id, res2.data.message);
-        }
+        filetype === "image" && replaceMessage(file.id, res2.data.message);
         if (res2.data.isFirstMessage) {
           queryClient.invalidateQueries({
             queryKey: ["known-users"],
@@ -146,7 +129,6 @@ const MyDropzone = ({
       });
       (await Promise.all(uploadpromises)).filter(Boolean);
       setUploadbox(false);
-      setUploading(false);
     } catch (error) {
       toast.error(`error:Failed to send message`);
       setUploading(false);
@@ -284,7 +266,7 @@ const MyDropzone = ({
 
           {uploadedFiles.length > 0 && (
             <motion.div className="mt-2 ">
-              <ul className="list-none  flex flex-wrap gap-4">
+              <ul className="list-none  flex flex-wrap gap-2">
                 {uploadedFiles.map((file) => (
                   <motion.li
                     initial={{ opacity: 0, scale: 0.5 }}
@@ -337,23 +319,21 @@ const MyDropzone = ({
                   </motion.li>
                 ))}
               </ul>
+              <motion.div className=" flex justify-end items-center  mt-2">
+                <Button
+                  key={"sendbutton"}
+                  className={`hover:scale-95 w-14 lg:w-16 lg:h-12 h-12 rounded-2xl cursor-pointer`}
+                  disabled={uploadedFiles.length === 0 || uploading}
+                  onClick={() => {
+                    HandleSendFiles();
+                  }}
+                >
+                  {<SendHorizontalIcon className={`scale-125`} />}
+                </Button>
+              </motion.div>
             </motion.div>
           )}
         </motion.div>
-        {uploadedFiles.length !== 0 && (
-          <motion.div className=" flex justify-end items-center  mt-2">
-            <Button
-              key={"sendbutton"}
-              className={`hover:scale-95 w-14 lg:w-16 lg:h-12 h-12 rounded-2xl cursor-pointer`}
-              disabled={uploadedFiles.length === 0 || uploading}
-              onClick={() => {
-                HandleSendFiles();
-              }}
-            >
-              {<SendHorizontalIcon className={`scale-125`} />}
-            </Button>
-          </motion.div>
-        )}
       </div>
     </AnimatePresence>
   );

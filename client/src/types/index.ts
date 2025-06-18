@@ -40,7 +40,7 @@ export type MessageType = {
   roomId: string;
   status: StatusType;
 };
-
+export type Filetype = "image" | "document";
 export type RoomParticipantType = {
   id: string;
   userId: string;

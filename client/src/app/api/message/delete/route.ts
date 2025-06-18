@@ -31,7 +31,7 @@ export async function DELETE(req: NextRequest) {
     );
     console.log("dleted content:", deletedMessage.content);
 
-    if (type === "document" && deletedMessage.content) {
+    if (type === "document") {
       try {
         await cloudinary.uploader.destroy(deletedMessage.content, {
           invalidate: true,
@@ -41,7 +41,7 @@ export async function DELETE(req: NextRequest) {
         console.error("Cloudinary cleanup failed:", cloudinaryError);
       }
     }
-    if (type === "image" && deletedMessage.content) {
+    if (type === "image") {
       try {
         await cloudinary.uploader.destroy(deletedMessage.content, {
           invalidate: true,
