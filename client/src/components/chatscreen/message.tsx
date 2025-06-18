@@ -95,17 +95,16 @@ export default function Message({
         </div>
       </div>
 
-      <MessageFooter MessageData={MessageData} />
+      <MessageFooter />
     </motion.div>
   );
 }
 
 // ---------------------------------------------------------------------
-function MessageFooter({
-  MessageData,
-}: // socket,
+function MessageFooter({}: // MessageData,
+// socket,
 {
-  MessageData: MessageType;
+  // MessageData: MessageType;
   // socket: Socket;
 }) {
   const time = new Date().toLocaleTimeString([], {
