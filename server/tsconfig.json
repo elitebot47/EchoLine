@@ -5,8 +5,9 @@
     "esModuleInterop": true,
     "strict": true,
 
-    "rootDir": "./", // <-- your TS entrypoint files
-    "outDir": "./dist" // <-- where compiled JS should go
+    "rootDir": "./", 
+    "outDir": "./dist" 
   },
-  "include": ["**/*.ts"] // <-- make sure your TS files are included
+  "include": ["**/*.ts"],
+  "exclude": ["node_modules", "dist"]
 }

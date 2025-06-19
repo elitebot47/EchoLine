@@ -41,10 +41,10 @@ const http = __importStar(require("http"));
 const socket_io_1 = require("socket.io");
 const app = (0, express_1.default)();
 const server = http.createServer(app);
-const port = 3001;
 const io = new socket_io_1.Server(server, {
     cors: {
-        origin: "*",
+        origin: "https://chat-app-roan-psi.vercel.app/",
+        methods: ["GET", "POST"],
     },
 });
 io.on("connection", (socket) => {
@@ -67,6 +67,7 @@ io.on("connection", (socket) => {
         socket.leave(data);
     });
 });
+const port = Number(process.env.PORT) || 3001;
 server.listen(port, "0.0.0.0", () => {
     console.log(`server listening on ${port}`);
 });
