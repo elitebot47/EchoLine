@@ -16,7 +16,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import type { MinimalUser } from "@/types";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowLeft, MenuIcon } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
@@ -29,7 +28,11 @@ import CustomAvatar from "../ui/customavatar";
 import { Input } from "../ui/input";
 import UserCard from "./usercard";
 
-export default function AccessibilityCard({ users }: { users: MinimalUser[] }) {
+export default function AccessibilityCard({
+  users,
+}: {
+  users: { id: string; name: string; image?: string | null }[];
+}) {
   const { data: session } = useSession();
   if (!session) {
     return <div>Not authenticated</div>;
@@ -39,9 +42,8 @@ export default function AccessibilityCard({ users }: { users: MinimalUser[] }) {
   const UsersRef = useRef(
     users.filter((User: any) => User.id != session?.user?.id)
   );
-  const [SearchedUsers, setSearchedUsers] = useState<MinimalUser[]>([]);
+  const [SearchedUsers, setSearchedUsers] = useState<any[]>([]);
   const [Searchpanel, setSearchpanel] = useState(false);
-  // const [settingpage, setSettingpage] = useState(false);
 
   useEffect(() => {
     if (!inputtext.trim()) {
@@ -212,7 +214,7 @@ export default function AccessibilityCard({ users }: { users: MinimalUser[] }) {
             )}
             {SearchedUsers.map((user) => (
               <motion.div key={user.id}>
-                <UserCard user={user} />
+                <UserCard user={user} notifications={user.notificationsSent} />
               </motion.div>
             ))}
           </motion.div>

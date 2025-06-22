@@ -2,6 +2,7 @@
 import { useMessagesStore } from "@/stores/MessagesStore";
 import { useSocketStore } from "@/stores/SocketStore";
 import type { MinimalMessage } from "@/types";
+import axios from "axios";
 import { AnimatePresence, motion } from "motion/react";
 import { useSession } from "next-auth/react";
 import { useEffect, useRef } from "react";
@@ -25,7 +26,17 @@ export default function ChatViewArea({
   useEffect(() => {
     setMessages(Messages?.filter(Boolean) ?? []);
   }, [Messages, setMessages]);
-
+  useEffect(() => {
+    const markNotificationSeen = async () => {
+      await axios.put("/api/notification/newmessages-seen", {
+        roomId,
+        recipientId: session?.user.id,
+      });
+    };
+    socket?.emit(`noti_seen_recipient`);
+    markNotificationSeen();
+    return () => {};
+  }, [roomId]);
   useEffect(() => {
     if (!socket || !roomId) return;
     socket?.emit("joinRoom", `${roomId}`);

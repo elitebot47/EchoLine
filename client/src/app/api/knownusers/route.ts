@@ -1,6 +1,5 @@
 import { getUser } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
-import type { MinimalUser } from "@/types";
 import { NextResponse } from "next/server";
 
 export async function GET() {
@@ -34,17 +33,27 @@ export async function GET() {
             image: true,
             id: true,
             name: true,
+            notificationsSent: {
+              where: { seen: false, recipientId: User.id },
+            },
           },
         },
       },
     });
+    console.log(
+      "notifications data is know users route-",
+      participants.map((p) => ({
+        notifications: p.user.notificationsSent,
+      }))
+    );
 
     const users = participants.map((p) => ({
       id: p.user.id,
       name: p.user.name,
       roomId: p.roomId,
       image: p.user.image,
-    })) as MinimalUser[];
+      notificationsSent: p.user.notificationsSent,
+    }));
 
     return NextResponse.json({ users });
   } catch (error) {

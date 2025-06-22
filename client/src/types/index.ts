@@ -1,3 +1,5 @@
+import type { Room, User } from "@prisma/client";
+
 export type RoomType = {
   id: string;
   createdAt: Date;
@@ -6,7 +8,10 @@ export type RoomType = {
   participants: RoomParticipantType[];
   messages: MessageType[];
 };
-export type MinimalUser = Pick<UserType, "id" | "name" | "image">;
+export type MinimalUser = Pick<
+  UserType,
+  "id" | "name" | "image" | "notificationsSent"
+>;
 export type MinimalMessage = Pick<
   MessageType,
   | "id"
@@ -40,6 +45,20 @@ export type MessageType = {
   roomId: string;
   status: StatusType;
 };
+export type NotificationType = {
+  id: string;
+  recipientId: string;
+  recipient: UserType;
+  senderId?: string;
+  sender?: User;
+  messageId?: string;
+  message?: string;
+  type: "NEW_MESSAGE" | "MENTION" | "ROOM_INVITE";
+  seen: boolean;
+  createdAt: Date;
+  roomId: string;
+  room: Room;
+};
 export type Filetype = "image" | "document";
 export type RoomParticipantType = {
   id: string;
@@ -56,4 +75,5 @@ export type UserType = {
   email: string;
   messageFrom: MessageType[];
   messagesTo: MessageType[];
+  notificationsSent: NotificationType[];
 };

@@ -22,6 +22,7 @@ export async function POST(req: NextRequest) {
       },
     });
     const isFirstMessage = existingMesages === 0;
+
     const message = await prisma.message.create({
       data: {
         ...result.data,
@@ -40,7 +41,14 @@ export async function POST(req: NextRequest) {
         fileType: true,
       },
     });
-    console.log("isFirstMessage", isFirstMessage);
+    await prisma.notification.create({
+      data: {
+        senderId: session.user.id,
+        recipientId: message.toId,
+        type: "NEW_MESSAGE",
+        roomId: message.roomId,
+      },
+    });
 
     return NextResponse.json({
       message,

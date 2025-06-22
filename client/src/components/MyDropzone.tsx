@@ -125,6 +125,16 @@ const MyDropzone = ({
         }
 
         socket?.emit("Chat_client", res2.data.message);
+        socket?.emit("send_notification", {
+          toUserId: res2.data.message.toId,
+          fromUser: {
+            id: session?.user?.id,
+            name: session?.user?.name,
+            image: session?.user?.image,
+          },
+          message: res2.data.message.content,
+          roomId: res2.data.message.roomId,
+        });
         setUploadedFiles([]);
       });
       (await Promise.all(uploadpromises)).filter(Boolean);

@@ -48,7 +48,6 @@ export default function Message({
     const isMine = MyId === MessageData.fromId;
     setisMine(isMine);
   }, [MyId]);
-  console.log("MessageData", MessageData);
 
   return (
     <motion.div

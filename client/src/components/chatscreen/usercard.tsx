@@ -1,26 +1,55 @@
 "use client";
+
 import { useShowChatStore } from "@/stores/showChatStore";
-import type { MinimalUser } from "@/types";
+import { useSocketStore } from "@/stores/SocketStore";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
+import { Badge } from "../ui/badge";
 import CustomAvatar from "../ui/customavatar";
-export default function UserCard({ user }: { user: MinimalUser }) {
-  const pathname = usePathname();
+export default function UserCard({
+  user,
+  notifications,
+}: {
+  user: any;
+  notifications: any;
+}) {
+  const path = usePathname();
   const setShowChat = useShowChatStore((state) => state.setShowChat);
+  const socket = useSocketStore((state) => state.socket);
+  console.log("notifications.length", notifications);
+
+  const [newMessageCount, setNewMessageCount] = useState(notifications?.length);
+  useEffect(() => {
+    const handleNotification = (data: any) => {
+      if (data.fromUser.id !== user.id) return;
+
+      if (data.fromUser.id === user.id && path !== `/c/${user.id}`) {
+        setNewMessageCount((prev: any) => prev + 1);
+      }
+    };
+    socket?.on("notification", handleNotification);
+    return () => {
+      socket?.off("notification", handleNotification);
+    };
+  }, [user.id, socket, path]);
 
   return (
     <motion.div
       className={`w-full  ${
-        pathname === `/c/${user.id}` ? "!bg-black text-white" : "bg-gray-500"
+        path === `/c/${user.id}` ? "!bg-black text-white" : "bg-gray-500"
       }`}
     >
       <Link
         className={`block`}
-        onClick={() => setShowChat(true)}
+        onClick={() => {
+          setShowChat(true);
+          setNewMessageCount(0);
+        }}
         href={`/c/${user.id}`}
       >
-        <div className="w-full items-center gap-2   h-20  flex px-4">
+        <div className="w-full items-center gap-2 pr-7  h-20  flex px-4">
           {user.image && (
             <CustomAvatar
               className={`rounded-full`}
@@ -30,7 +59,17 @@ export default function UserCard({ user }: { user: MinimalUser }) {
               src={`${user?.image}`}
             />
           )}
-          <div className={`text-2xl font-semibold`}>{user.name}</div>
+          <div className={`text-3xl font-semibold`}>{user.name}</div>
+          {newMessageCount > 0 && (
+            <div className="ml-auto">
+              <Badge
+                className={`rounded-full h-12 w-12 text-2xl text-center`}
+                variant="default"
+              >
+                {newMessageCount}
+              </Badge>
+            </div>
+          )}
         </div>
       </Link>
     </motion.div>

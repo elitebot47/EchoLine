@@ -2,7 +2,6 @@
 
 import { useShowChatStore } from "@/stores/showChatStore";
 import { useSocketStore } from "@/stores/SocketStore";
-import type { MinimalUser } from "@/types";
 import clsx from "clsx";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
@@ -13,7 +12,7 @@ export default function ChatScreenHeader({
   user,
   roomId,
 }: {
-  user: MinimalUser;
+  user: { id: string; name: string; image?: string | null };
   roomId: string;
 }) {
   // const { data: session } = useSession();
@@ -21,7 +20,6 @@ export default function ChatScreenHeader({
   const setChat = useShowChatStore((state) => state.setShowChat);
   const socket = useSocketStore((state) => state.socket);
   const [Typingstatus, setTypingstatus] = useState(false);
-  console.log(user);
 
   useEffect(() => {
     if (!socket || !user) return;
@@ -82,7 +80,7 @@ export default function ChatScreenHeader({
             {Typingstatus && (
               <motion.div
                 key={"typing-text"}
-                initial={{ opacity: 0 }}
+                initial={{ opacity: 0.5 }}
                 animate={{ opacity: 1 }}
                 transition={{
                   duration: 0.5,
@@ -90,7 +88,7 @@ export default function ChatScreenHeader({
                   repeatType: "reverse",
                   ease: "easeInOut",
                 }}
-                className="flex justify-start items-center text-sm mb-2 mt-0 pt-0  text-green-500"
+                className="flex justify-start items-center text-sm mb-2 mt-0 pt-0 font-semibold text-black"
               >
                 Typing...
               </motion.div>

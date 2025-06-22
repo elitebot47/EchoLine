@@ -4,7 +4,6 @@ import AccessibilityCard from "@/components/chatscreen/accessibilitycard";
 import UserList from "@/components/chatscreen/userlist";
 import { useMobileStore } from "@/stores/isMobileStore";
 import { useShowChatStore } from "@/stores/showChatStore";
-import type { MinimalUser } from "@/types";
 import { AnimatePresence, motion } from "framer-motion";
 import { Plus } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -13,12 +12,13 @@ export default function ResponsiveChatLayout({
   users,
   children,
 }: {
-  users: MinimalUser[];
+  users: { id: string; name: string; image?: string | null }[];
   children: React.ReactNode;
 }) {
   const showChat = useShowChatStore((state) => state.showChat);
   const setIsMobile = useMobileStore((state) => state.setIsMobile);
   const [mobileBannerStatus, setMobileBannerStatus] = useState(false);
+
   const isMobile = ReactResponsiveUseMediaQuery({
     query: "(max-width: 768px)",
   });

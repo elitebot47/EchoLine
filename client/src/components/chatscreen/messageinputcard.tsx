@@ -75,11 +75,22 @@ export default function MessageInputCard({
           queryKey: ["known-users"],
         });
       }
-      console.log("now sending socket message to other user");
-      console.log(res.data.message);
-
       socket?.emit("Chat_client", res.data.message);
+      console.log("message-data:", res.data.message);
+
+      socket?.emit("send_notification", {
+        toUserId: recipient.user.id,
+        fromUser: {
+          id: session?.user?.id,
+          name: session?.user?.name,
+          image: session?.user?.image,
+        },
+        message: res.data.message.content,
+        roomId: res.data.message.roomId,
+      });
+
       console.log("socket message recived");
+
       setchattext("");
     } catch (error) {
       console.log(error);
