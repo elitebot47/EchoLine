@@ -29,8 +29,8 @@ model Room {
   type      RoomType
   updatedAt DateTime @updatedAt
 
-  participants RoomParticipant[]
-  messages     Message[]
+  participants  RoomParticipant[]
+  messages      Message[]
   notifications Notification[]
 }
 
@@ -48,21 +48,21 @@ model RoomParticipant {
 }
 
 model Message {
-  id           String         @id @default(uuid()) @db.Uuid
-  from         User           @relation("MessagesFrom", fields: [fromId], references: [id])
-  fromId       String         @db.Uuid
-  to           User           @relation("MessagesTo", fields: [toId], references: [id])
-  toId         String         @db.Uuid
-  fileName     String?
-  fileSize     Int?
-  fileType     String?
-  createdAt    DateTime       @default(now())
-  content      String
-  contentType  ContentType
-  updatedAt    DateTime       @updatedAt
-  room         Room           @relation(fields: [roomId], references: [id])
-  roomId       String         @db.Uuid
-  status       StatusType     @default(SENT)
+  id            String         @id @default(uuid()) @db.Uuid
+  from          User           @relation("MessagesFrom", fields: [fromId], references: [id])
+  fromId        String         @db.Uuid
+  to            User           @relation("MessagesTo", fields: [toId], references: [id])
+  toId          String         @db.Uuid
+  fileName      String?
+  fileSize      Int?
+  fileType      String?
+  createdAt     DateTime       @default(now())
+  content       String
+  contentType   ContentType
+  updatedAt     DateTime       @updatedAt
+  room          Room           @relation(fields: [roomId], references: [id])
+  roomId        String         @db.Uuid
+  status        StatusType     @default(SENT)
   notifications Notification[]
 
   @@index([roomId, createdAt(sort: Desc)])
