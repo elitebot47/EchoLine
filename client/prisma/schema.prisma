@@ -14,9 +14,11 @@ model User {
   image    String?
   password String?
 
-  rooms        RoomParticipant[]
-  messagesFrom Message[]         @relation("MessagesFrom")
-  messagesTo   Message[]         @relation("MessagesTo")
+  rooms                 RoomParticipant[]
+  messagesFrom          Message[]         @relation("MessagesFrom")
+  messagesTo            Message[]         @relation("MessagesTo")
+  notificationsReceived Notification[]    @relation("NotificationRecipient")
+  notificationsSent     Notification[]    @relation("NotificationSender")
 
   @@index([name])
 }
@@ -29,6 +31,7 @@ model Room {
 
   participants RoomParticipant[]
   messages     Message[]
+  notifications Notification[]
 }
 
 model RoomParticipant {
@@ -45,27 +48,52 @@ model RoomParticipant {
 }
 
 model Message {
-  id          String      @id @default(uuid()) @db.Uuid
-  from        User        @relation("MessagesFrom", fields: [fromId], references: [id])
-  fromId      String      @db.Uuid
-  to          User        @relation("MessagesTo", fields: [toId], references: [id])
-  toId        String      @db.Uuid
-  fileName    String?
-  fileSize    Int?
-  fileType    String?
-  createdAt   DateTime    @default(now())
-  content     String
-  contentType ContentType
-  updatedAt   DateTime    @updatedAt
-  room        Room        @relation(fields: [roomId], references: [id])
-  roomId      String      @db.Uuid
-  status      StatusType  @default(SENT)
+  id           String         @id @default(uuid()) @db.Uuid
+  from         User           @relation("MessagesFrom", fields: [fromId], references: [id])
+  fromId       String         @db.Uuid
+  to           User           @relation("MessagesTo", fields: [toId], references: [id])
+  toId         String         @db.Uuid
+  fileName     String?
+  fileSize     Int?
+  fileType     String?
+  createdAt    DateTime       @default(now())
+  content      String
+  contentType  ContentType
+  updatedAt    DateTime       @updatedAt
+  room         Room           @relation(fields: [roomId], references: [id])
+  roomId       String         @db.Uuid
+  status       StatusType     @default(SENT)
+  notifications Notification[]
 
   @@index([roomId, createdAt(sort: Desc)])
   @@index([fromId, createdAt(sort: Desc)])
   @@index([roomId, fromId])
   @@index([createdAt(sort: Desc)])
   @@index([status, createdAt])
+}
+
+model Notification {
+  id          String           @id @default(uuid()) @db.Uuid
+  recipientId String           @db.Uuid
+  recipient   User             @relation("NotificationRecipient", fields: [recipientId], references: [id])
+  senderId    String?          @db.Uuid
+  sender      User?            @relation("NotificationSender", fields: [senderId], references: [id])
+  messageId   String?          @db.Uuid
+  message     Message?         @relation(fields: [messageId], references: [id])
+  type        NotificationType
+  seen        Boolean          @default(false)
+  createdAt   DateTime         @default(now())
+  roomId      String?          @db.Uuid
+  room        Room?            @relation(fields: [roomId], references: [id])
+
+  @@index([recipientId, seen])
+  @@index([recipientId, createdAt(sort: Desc)])
+}
+
+enum NotificationType {
+  NEW_MESSAGE
+  MENTION
+  ROOM_INVITE
 }
 
 enum StatusType {
