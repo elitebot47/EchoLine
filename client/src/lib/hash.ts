@@ -14,7 +14,7 @@ export async function HashPassword(password: string) {
   }
 }
 export async function VerifyPassword(hashpassword: string, password: string) {
-  let pass = password.trim();
+  const pass = password.trim();
   try {
     return await argon2.verify(hashpassword, pass);
   } catch (error) {

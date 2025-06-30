@@ -4,6 +4,7 @@ import Credentials from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
 import { VerifyPassword } from "./lib/hash";
 import { prisma } from "./lib/prisma";
+import type { Session } from "next-auth";
 declare module "next-auth" {
   interface Session {
     user: {
@@ -113,13 +114,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       }
       return token;
     },
-    async session({ session, token }: { session: any; token: JWT }) {
+    async session({ session, token }: { session: Session; token: JWT }) {
       if (session.user) {
         if (token) {
-          session.user.id = token.id;
-          session.user.email = token.email;
-          session.user.name = token.name;
-          session.user.image = token.image;
+          session.user.id = String(token.id ?? "");
+          session.user.email = String(token.email ?? "");
+          session.user.name = token.name ? String(token.name) : null;
+          session.user.image = token.image ? String(token.image) : null;
         }
       }
       return session;

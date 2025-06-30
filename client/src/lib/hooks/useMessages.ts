@@ -6,7 +6,7 @@ const fetchMessages = async (roomId: string): Promise<MinimalMessage[]> => {
   const res = await axios.get(`/api/message/fetchForRoom?roomId=${roomId}`);
   const messages = res.data.messages;
   
-  return messages.map((message: any) => ({
+  return messages.map((message: MinimalMessage) => ({
     ...message,
     clientId: message.clientId || message.id,
   }));

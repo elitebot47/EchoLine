@@ -49,9 +49,13 @@ export async function POST(req: NextRequest) {
       },
     });
     return NextResponse.json({ message: "success" }, { status: 200 });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    let message = "Unknown error";
+    if (typeof error === "object" && error && "message" in error) {
+      message = String((error as { message?: string }).message);
+    }
     return NextResponse.json({
-      message: "error:" + error.message,
+      message: "error:" + message,
     });
   }
 }
@@ -75,9 +79,13 @@ export async function DELETE(req: NextRequest) {
       { message: "successfully removed profile picture" },
       { status: 200 }
     );
-  } catch (error: any) {
+  } catch (error: unknown) {
+    let message = "Unknown error";
+    if (typeof error === "object" && error && "message" in error) {
+      message = String((error as { message?: string }).message);
+    }
     return NextResponse.json({
-      message: "error:" + error.message,
+      message: "error:" + message,
     });
   }
 }

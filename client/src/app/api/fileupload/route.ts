@@ -48,9 +48,9 @@ export async function POST(req: NextRequest) {
 
     const cloudinaryResponse = await res.data;
     return NextResponse.json(cloudinaryResponse, { status: res.status });
-  } catch (error: any) {
+  } catch (error: unknown) {
     return NextResponse.json({
-      message: "error:" + error.message,
+      message: "error:" + error,
     });
   }
 }

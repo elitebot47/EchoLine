@@ -21,7 +21,7 @@ export default async function ChatViewPage({
   const myId = User.id;
   console.log("myid", myId);
   if (userid === myId) {
-    return <div>Chat Unavailable, you can't message yourself</div>;
+    return <div>Chat Unavailable, you can&apos;t message yourself</div>;
   }
   let room;
   try {
@@ -71,17 +71,17 @@ export default async function ChatViewPage({
       });
     }
   } catch (error) {
-    return <div>{`Unexpected Error occurred: ${error}`}</div>;
+    return <div>{`Unexpected Error occurred: ${error}`.replace("'", "&apos;")}</div>;
   }
 
   if (!room) {
-    return <div>Room not found or could not be created.</div>;
+    return <div>{"Room not found or could not be created.".replace("'", "&apos;")}</div>;
   }
   const thisUser = room.participants.find(
     (user) => user.user.id !== User.id
   )?.user;
   if (!thisUser) {
-    return <div>Error while fecthing user's Profile</div>;
+    return <div>Error while fecthing user&apos;s Profile</div>;
   }
   return (
     <div className="flex flex-col h-screen relative  w-full">
