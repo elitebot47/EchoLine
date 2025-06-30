@@ -1,7 +1,5 @@
-// src/components/MyDropzone.tsx
-import { useMessagesStore } from "@/stores/MessagesStore";
 import { useSocketStore } from "@/stores/SocketStore";
-import type { Filetype } from "@/types";
+import type { Filetype, MinimalMessage } from "@/types";
 import { useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { AnimatePresence, motion } from "framer-motion";
@@ -34,8 +32,6 @@ const MyDropzone = ({
   const [uploadedFiles, setUploadedFiles] = useState<FileWithPreview[]>([]);
   const socket = useSocketStore((state) => state.socket);
   const queryClient = useQueryClient();
-  const addMessage = useMessagesStore((state) => state.addMessage);
-  const replaceMessage = useMessagesStore((state) => state.replaceMessage);
   const isSendingRef = React.useRef(false);
 
   async function HandleSendFiles() {
@@ -74,16 +70,19 @@ const MyDropzone = ({
         }
         formData.append("upload_preset", uploadPresets[filetype]);
         if (filetype === "image") {
-          addMessage({
-            id: file.id,
-            toId,
-            roomId,
-            fromId: session?.user?.id,
-            content: file.preview,
-            contentType: filetype,
-            updatedAt: new Date(),
-            createdAt: new Date(),
-          });
+          queryClient.setQueryData(["messages", roomId], (old = []) => [
+            ...(old as MinimalMessage[]),
+            {
+              id: file.id,
+              toId,
+              roomId,
+              fromId: session?.user?.id,
+              content: file.preview,
+              contentType: filetype,
+              updatedAt: new Date(),
+              createdAt: new Date(),
+            },
+          ]);
         }
 
         setUploadbox(false);
@@ -101,21 +100,30 @@ const MyDropzone = ({
         });
 
         if (filetype === "document") {
-          addMessage({
-            id: res2.data.message.id,
-            toId,
-            roomId,
-            fromId: session?.user?.id,
-            content: res2.data.message.content,
-            contentType: "document",
-            updatedAt: new Date(),
-            createdAt: new Date(),
-            fileName: file.name,
-            fileSize: file.size,
-            fileType: file.type,
-          });
+          queryClient.setQueryData(["messages", roomId], (old = []) => [
+            ...(old as MinimalMessage[]),
+            {
+              id: res2.data.message.id,
+              toId,
+              roomId,
+              fromId: session?.user?.id,
+              content: res2.data.message.content,
+              contentType: "document",
+              updatedAt: new Date(),
+              createdAt: new Date(),
+              fileName: file.name,
+              fileSize: file.size,
+              fileType: file.type,
+            },
+          ]);
         }
-        filetype === "image" && replaceMessage(file.id, res2.data.message);
+        filetype === "image" &&
+          queryClient.setQueryData(["messages", roomId], (old = []) =>
+            (old as MinimalMessage[]).map((msg) =>
+              msg.id === file.id ? res2.data.message : msg
+            )
+          );
+
         if (res2.data.isFirstMessage) {
           queryClient.invalidateQueries({
             queryKey: ["known-users"],

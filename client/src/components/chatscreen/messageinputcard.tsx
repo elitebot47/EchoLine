@@ -1,9 +1,10 @@
 "use client";
 
 import type { MessageCreateInput } from "@/lib/schemas/message";
-import { useMessagesStore } from "@/stores/MessagesStore";
+import { createOptimisticMessage } from "@/lib/utils/messageUtils";
 import { useSocketStore } from "@/stores/SocketStore";
-import { useQueryClient } from "@tanstack/react-query";
+import type { MinimalMessage } from "@/types";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { AnimatePresence, motion } from "framer-motion";
 import { find } from "linkifyjs";
@@ -15,6 +16,7 @@ import { toast } from "sonner";
 import MyDropzone from "../MyDropzone";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
+import Spinner from "../ui/spinner";
 
 type MinimalParticipant = { user: { id: string; name: string } };
 
@@ -22,6 +24,7 @@ type MessageInputCardProps = {
   id: string;
   participants: MinimalParticipant[];
 };
+
 export default function MessageInputCard({
   id,
   participants,
@@ -31,16 +34,70 @@ export default function MessageInputCard({
   const socket = useSocketStore((state) => state.socket);
   const queryClient = useQueryClient();
   const [uploading, setUploading] = useState<boolean>(false);
-
-  const addMessage = useMessagesStore((state) => state.addMessage);
   const [chattext, setchattext] = useState("");
-
   const [uploadbox, setUploadbox] = useState(false);
-
   const recipient = participants.find(
     (user) => user.user.id !== session?.user?.id
   );
-  console.log("recipient:", recipient);
+
+  const mutation = useMutation({
+    mutationFn: async (payload: MessageCreateInput) => {
+      const res = await axios.post("/api/message/add", payload);
+      return res.data.message;
+    },
+    onMutate: async (newMessage) => {
+      await queryClient.cancelQueries({ queryKey: ["messages", id] });
+
+      const previousMessages = queryClient.getQueryData(["messages", id]);
+
+      const optimisticMessage = createOptimisticMessage(
+        {
+          ...newMessage,
+          createdAt: new Date().toISOString(),
+        },
+        session?.user.id || ""
+      );
+
+      queryClient.setQueryData(["messages", id], (old = []) => [
+        ...(old as MinimalMessage[]),
+        optimisticMessage,
+      ]);
+
+      return { previousMessages, tempId: optimisticMessage.id };
+    },
+    onError: (err, _newMessage, context) => {
+      if (context?.previousMessages) {
+        queryClient.setQueryData(["messages", id], context.previousMessages);
+      }
+
+      if (axios.isAxiosError(err)) {
+        toast.error(err.response?.data?.message || "Failed to send message");
+      } else {
+        toast.error("Failed to send message");
+      }
+    },
+    onSuccess: (message, _newMessage, context) => {
+      queryClient.setQueryData(["messages", id], (old = []) =>
+        (old as MinimalMessage[]).map((msg) =>
+          msg.id === context?.tempId
+            ? { ...message, clientId: msg.clientId, optimistic: false }
+            : msg
+        )
+      );
+
+      socket?.emit("Chat_client", message);
+      socket?.emit("send_notification", {
+        toUserId: recipient?.user.id,
+        fromUser: {
+          id: session?.user?.id,
+          name: session?.user?.name,
+          image: session?.user?.image,
+        },
+        message: message.content,
+        roomId: message.roomId,
+      });
+    },
+  });
 
   async function HandleSend() {
     if (!chattext) {
@@ -61,35 +118,13 @@ export default function MessageInputCard({
         toast.error("Error:recipient error ,please try again later");
         return;
       }
-      const res = await axios.post("/api/message/add", {
+      mutation.mutate({
         content: String(chattext),
         contentType: String(detectedContentType),
         roomId: String(id),
         toId: String(recipient.user.id),
+        fromId: session?.user.id,
       } as MessageCreateInput);
-      if (res.data.message) {
-        addMessage(res.data.message);
-      }
-      if (res.data.isFirstMessage) {
-        queryClient.invalidateQueries({
-          queryKey: ["known-users"],
-        });
-      }
-      socket?.emit("Chat_client", res.data.message);
-      console.log("message-data:", res.data.message);
-
-      socket?.emit("send_notification", {
-        toUserId: recipient.user.id,
-        fromUser: {
-          id: session?.user?.id,
-          name: session?.user?.name,
-          image: session?.user?.image,
-        },
-        message: res.data.message.content,
-        roomId: res.data.message.roomId,
-      });
-
-      console.log("socket message recived");
 
       setchattext("");
     } catch (error) {
@@ -194,7 +229,7 @@ function AttachButton({
       title="Attach"
       className="hover:scale-105 lg:w-16 lg:h-10 w-14 h-12  cursor-pointer"
     >
-      <LucidePaperclip />
+      {uploading ? <Spinner className=" size-7" /> : <LucidePaperclip />}
     </Button>
   );
 }

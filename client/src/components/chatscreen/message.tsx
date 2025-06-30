@@ -18,9 +18,9 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
-import { useMessagesStore } from "@/stores/MessagesStore";
 import { useSocketStore } from "@/stores/SocketStore";
-import type { MessageType } from "@/types";
+import type { MessageType, MinimalMessage } from "@/types";
+import { QueryClient, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import clsx from "clsx";
 import { AnimatePresence, easeIn, motion } from "framer-motion";
@@ -39,15 +39,15 @@ export default function Message({
   MyId: string;
 }) {
   const [imageloading, setImageloading] = useState(true);
-  const [isMine, setisMine] = useState(false);
+  const [isMine, setisMine] = useState(true);
   const [deleting, setDeleting] = useState(false);
-  const deleteMessage = useMessagesStore((state) => state.deleteMessage);
   const socket = useSocketStore((state) => state.socket);
   const type = MessageData.contentType;
   useEffect(() => {
     const isMine = MyId === MessageData.fromId;
     setisMine(isMine);
   }, [MyId]);
+  const queryClient = useQueryClient();
 
   return (
     <motion.div
@@ -72,8 +72,8 @@ export default function Message({
         }   z-10`}
       >
         <MessageOptions
+          queryClient={queryClient}
           MessageData={MessageData}
-          deleteMessage={deleteMessage}
           setDeleting={setDeleting}
           socket={socket}
           MyId={MyId}
@@ -334,10 +334,10 @@ function MessageOptions({
   MyId,
   socket,
   setDeleting,
-  deleteMessage,
   isMine,
+  queryClient,
 }: {
-  deleteMessage: any;
+  queryClient: QueryClient;
   MessageData: MessageType;
   MyId: string;
   socket: Socket | null;
@@ -361,14 +361,19 @@ function MessageOptions({
             setDeleting(true);
 
             try {
-              const res = await axios.delete("/api/message/delete", {
+              await axios.delete("/api/message/delete", {
                 data: {
                   id: MessageData.id,
                   type: MessageData.contentType,
                 },
               });
-
-              deleteMessage(res.data.messageId);
+              queryClient.setQueryData(
+                ["messages", MessageData.roomId],
+                (old = []) =>
+                  (old as MinimalMessage[]).filter(
+                    (msg) => msg.id != MessageData.id
+                  )
+              );
               setDeleting(false);
               socket?.emit("delete-message", {
                 id: MessageData.id,

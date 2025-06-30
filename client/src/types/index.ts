@@ -12,20 +12,21 @@ export type MinimalUser = Pick<
   UserType,
   "id" | "name" | "image" | "notificationsSent"
 >;
-export type MinimalMessage = Pick<
-  MessageType,
-  | "id"
-  | "roomId"
-  | "fromId"
-  | "toId"
-  | "createdAt"
-  | "content"
-  | "contentType"
-  | "updatedAt"
-  | "fileName"
-  | "fileSize"
-  | "fileType"
->;
+export type MinimalMessage = {
+  id: string;
+  roomId: string;
+  fromId: string;
+  toId: string;
+  createdAt: string;
+  updatedAt: string;
+  content: string;
+  contentType: string;
+  fileName?: string | null;
+  fileSize?: number | null;
+  fileType?: string | null;
+  clientId: string;
+  optimistic?: boolean;
+};
 export type StatusType = "SENDING" | "SENT" | "DELIVERED" | "READ";
 
 export type MessageType = {
