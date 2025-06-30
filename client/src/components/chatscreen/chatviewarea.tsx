@@ -1,7 +1,6 @@
 "use client";
 import { useMessagesStore } from "@/stores/MessagesStore";
 import { useSocketStore } from "@/stores/SocketStore";
-import type { MinimalMessage } from "@/types";
 import axios from "axios";
 import { AnimatePresence, motion } from "motion/react";
 import { useSession } from "next-auth/react";
@@ -9,13 +8,7 @@ import { useEffect, useRef } from "react";
 import { animateScroll as scroll } from "react-scroll";
 import Message from "./message";
 
-export default function ChatViewArea({
-  Messages,
-  roomId,
-}: {
-  Messages: MinimalMessage[];
-  roomId: string;
-}) {
+export default function ChatViewArea({ roomId }: { roomId: string }) {
   const { data: session } = useSession();
   const socket = useSocketStore((state) => state.socket);
   const messages = useMessagesStore((state) => state.messages);
@@ -24,8 +17,19 @@ export default function ChatViewArea({
   const deleteMessage = useMessagesStore((state) => state.deleteMessage);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    setMessages(Messages?.filter(Boolean) ?? []);
-  }, [Messages, setMessages]);
+    if (!roomId) return;
+    const fetchMessages = async () => {
+      try {
+        const res = await axios.get(
+          `/api/message/fetchForRoom?roomId=${roomId}`
+        );
+        setMessages(res.data.messages || []);
+      } catch (err) {
+        setMessages([]);
+      }
+    };
+    fetchMessages();
+  }, [roomId, setMessages]);
   useEffect(() => {
     const markNotificationSeen = async () => {
       await axios.put("/api/notification/newmessages-seen", {

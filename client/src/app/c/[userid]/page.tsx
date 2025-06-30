@@ -4,8 +4,6 @@ import MessageInputCard from "@/components/chatscreen/messageinputcard";
 import { getUser } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
 
-import type { MinimalMessage } from "@/types";
-
 export default async function ChatViewPage({
   params,
 }: {
@@ -38,9 +36,6 @@ export default async function ChatViewPage({
       },
       select: {
         id: true,
-        type: true,
-        createdAt: true,
-        updatedAt: true,
         participants: {
           select: {
             user: {
@@ -50,21 +45,6 @@ export default async function ChatViewPage({
                 image: true,
               },
             },
-          },
-        },
-        messages: {
-          select: {
-            id: true,
-            roomId: true,
-            fromId: true,
-            toId: true,
-            createdAt: true,
-            content: true,
-            contentType: true,
-            updatedAt: true,
-            fileName: true,
-            fileSize: true,
-            fileType: true,
           },
         },
       },
@@ -77,9 +57,7 @@ export default async function ChatViewPage({
         },
         select: {
           id: true,
-          type: true,
-          createdAt: true,
-          updatedAt: true,
+
           participants: {
             select: {
               id: true,
@@ -87,21 +65,6 @@ export default async function ChatViewPage({
               roomId: true,
               room: { select: { id: true } },
               user: { select: { id: true, name: true, image: true } },
-            },
-          },
-          messages: {
-            select: {
-              id: true,
-              roomId: true,
-              fromId: true,
-              toId: true,
-              createdAt: true,
-              content: true,
-              contentType: true,
-              updatedAt: true,
-              fileName: true,
-              fileSize: true,
-              fileType: true,
             },
           },
         },
@@ -126,14 +89,7 @@ export default async function ChatViewPage({
         <ChatScreenHeader roomId={room.id} user={thisUser} />
       </div>
       <div className="flex-1 absolute   w-full   z-0 h-screen  overflow-auto">
-        <ChatViewArea
-          Messages={
-            room?.messages.filter(
-              (msg) => msg.toId !== null
-            ) as MinimalMessage[]
-          }
-          roomId={room.id}
-        />
+        <ChatViewArea roomId={room.id} />
       </div>
       <div className="w-full lg:h-14 h-16 z-20   absolute bottom-0">
         <MessageInputCard id={room.id} participants={room.participants} />
