@@ -1,7 +1,7 @@
 import * as argon2 from "argon2";
 
 export async function HashPassword(password: string) {
-  let pass = password.trim();
+  const pass = password.trim();
   try {
     return await argon2.hash(pass, {
       type: argon2.argon2id,
@@ -9,7 +9,7 @@ export async function HashPassword(password: string) {
       timeCost: 3,
       parallelism: 1,
     });
-  } catch (error) {
+  } catch {
     throw new Error("error hashing password");
   }
 }

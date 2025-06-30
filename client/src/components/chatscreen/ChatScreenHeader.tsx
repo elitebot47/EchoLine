@@ -39,7 +39,7 @@ export default function ChatScreenHeader({
       if (typingTimeout) clearTimeout(typingTimeout);
       setTypingstatus(false);
     };
-  }, [socket, roomId]);
+  }, [socket, roomId, user]);
   return (
     <div className="text-2xl px-4 h-full bg-black/20  items-center flex w-full ">
       <div className="mr-4 block lg:hidden ">

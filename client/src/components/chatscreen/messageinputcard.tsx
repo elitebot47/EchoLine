@@ -158,7 +158,7 @@ export default function MessageInputCard({
               />
             )}
 
-        {uploadbox && (
+        {uploadbox && recipient && (
           <UploadBox
             key={"upload-box"}
             recipient={recipient}
@@ -183,7 +183,7 @@ function UploadBox({
   RoomId,
 }: {
   setUploadbox: React.Dispatch<React.SetStateAction<boolean>>;
-  recipient: any;
+  recipient: { user: { id: string; name: string; image?: string | null } };
   uploading: boolean;
   setUploading: React.Dispatch<React.SetStateAction<boolean>>;
   RoomId: string;

@@ -18,18 +18,20 @@ import Spinner from "@/components/ui/spinner";
 import axios from "axios";
 import { Plus, Upload } from "lucide-react";
 import { useSession } from "next-auth/react";
+import Image from "next/image";
 import React, { useRef, useState } from "react";
 import { toast } from "sonner";
 export default function SettingPage() {
   const { data: session } = useSession();
-  if (!session) {
-    return <div>Not authenticated</div>;
-  }
   const [imageviewdialog, setImageviewdialog] = useState(false);
   const [Imagepreviewdata, setImagepreviewdata] =
     useState<FileWithPreview | null>(null);
   const [imageUpdateLoader, setImageUpdateLoader] = useState(false);
   const avatarActionLoader = useRef<boolean>(false);
+
+  if (!session) {
+    return <div>Not authenticated</div>;
+  }
 
   async function ViewImagePreview(e: React.ChangeEvent<HTMLInputElement>) {
     console.log("currently in view async function");
@@ -79,7 +81,7 @@ export default function SettingPage() {
                   toast.success(
                     "Profile picture removed sucessfully,Changes may take time."
                   );
-                } catch (error) {
+                } catch {
                   toast.error(
                     "Error: Unable to remove profile picture,try again later"
                   );
@@ -129,9 +131,10 @@ export default function SettingPage() {
                 </DialogHeader>
                 <div>
                   {Imagepreviewdata?.preview && (
-                    <img
+                    <Image
                       width={500}
                       height={500}
+                      alt="Profile preview"
                       src={Imagepreviewdata.preview}
                       className="max-w-full h-auto object-contain mx-auto"
                     />
@@ -181,7 +184,7 @@ export default function SettingPage() {
                           "Profile picture changed succesfully,changes may take hours to to be visible"
                         );
                         setImagepreviewdata(null);
-                      } catch (error) {
+                      } catch {
                         toast.error(
                           "error while Updating profile!,try again later"
                         );

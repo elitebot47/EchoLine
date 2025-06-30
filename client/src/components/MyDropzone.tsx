@@ -5,6 +5,7 @@ import axios from "axios";
 import { AnimatePresence, motion } from "framer-motion";
 import { Plus, SendHorizontalIcon } from "lucide-react";
 import { useSession } from "next-auth/react";
+import Image from "next/image";
 import React, { useCallback, useEffect, useState } from "react";
 import { type FileRejection, useDropzone } from "react-dropzone";
 import { toast } from "sonner";
@@ -117,12 +118,13 @@ const MyDropzone = ({
             },
           ]);
         }
-        filetype === "image" &&
+        if (filetype === "image") {
           queryClient.setQueryData(["messages", roomId], (old = []) =>
             (old as MinimalMessage[]).map((msg) =>
               msg.id === file.id ? res2.data.message : msg
             )
           );
+        }
 
         if (res2.data.isFirstMessage) {
           queryClient.invalidateQueries({
@@ -145,9 +147,9 @@ const MyDropzone = ({
         });
         setUploadedFiles([]);
       });
-      (await Promise.all(uploadpromises)).filter(Boolean);
+      await Promise.all(uploadpromises);
       setUploadbox(false);
-    } catch (error) {
+    } catch {
       toast.error(`error:Failed to send message`);
       setUploading(false);
     } finally {
@@ -314,9 +316,11 @@ const MyDropzone = ({
                       </Button>
                       <div>
                         {file.type.startsWith("image/") && (
-                          <img
+                          <Image
                             src={file.preview}
                             alt={file.id}
+                            width={200}
+                            height={250}
                             className=" w-fit max-h-[250px]  h-fit  object-contain mb-1 rounded-2xl "
                           />
                         )}

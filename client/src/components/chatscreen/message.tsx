@@ -27,6 +27,7 @@ import { AnimatePresence, easeIn, motion } from "framer-motion";
 import { Ellipsis, FileDown, X } from "lucide-react";
 import { CldImage } from "next-cloudinary";
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import type { Socket } from "socket.io-client";
 import { toast } from "sonner";
 import { MessageStatus } from "../message/messageStatus";
@@ -35,7 +36,7 @@ export default function Message({
   MessageData,
   MyId,
 }: {
-  MessageData: any;
+  MessageData: MessageType;
   MyId: string;
 }) {
   const [imageloading, setImageloading] = useState(true);
@@ -46,7 +47,7 @@ export default function Message({
   useEffect(() => {
     const isMine = MyId === MessageData.fromId;
     setisMine(isMine);
-  }, [MyId]);
+  }, [MyId, MessageData.fromId]);
   const queryClient = useQueryClient();
 
   return (
@@ -104,12 +105,7 @@ export default function Message({
 }
 
 // ---------------------------------------------------------------------
-function MessageFooter({}: // MessageData,
-// socket,
-{
-  // MessageData: MessageType;
-  // socket: Socket;
-}) {
+function MessageFooter() {
   const time = new Date().toLocaleTimeString([], {
     hour: "2-digit",
     minute: "2-digit",
@@ -167,7 +163,7 @@ function DocumentContent({ MessageData }: { MessageData: MessageType }) {
 }
 function BlobImagePreview({ MessageData }: { MessageData: MessageType }) {
   return (
-    <img
+    <Image
       width={300}
       height={300}
       loading="eager"
@@ -234,7 +230,7 @@ function ImageContent({
 }: {
   MessageData: MessageType;
   imageloading: boolean;
-  setImageloading: any;
+  setImageloading: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   return (
     <div>
@@ -267,7 +263,7 @@ function ImagePreview({
 }: {
   MessageData: MessageType;
   imageloading: boolean;
-  setImageloading: any;
+  setImageloading: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   return (
     <Dialog>
@@ -341,7 +337,7 @@ function MessageOptions({
   MessageData: MessageType;
   MyId: string;
   socket: Socket | null;
-  setDeleting: any;
+  setDeleting: React.Dispatch<React.SetStateAction<boolean>>;
   isMine: boolean;
 }) {
   return (

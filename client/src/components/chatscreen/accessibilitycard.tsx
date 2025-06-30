@@ -34,15 +34,11 @@ export default function AccessibilityCard({
   users: { id: string; name: string; image?: string | null }[];
 }) {
   const { data: session } = useSession();
-  if (!session) {
-    return <div>Not authenticated</div>;
-  }
-
   const [inputtext, setInputtext] = useState("");
   const UsersRef = useRef(
-    users.filter((User: any) => User.id != session?.user?.id)
+    users.filter((User: { id: string; name: string; image?: string | null }) => User.id != session?.user?.id)
   );
-  const [SearchedUsers, setSearchedUsers] = useState<any[]>([]);
+  const [SearchedUsers, setSearchedUsers] = useState<{ id: string; name: string; image?: string | null }[]>([]);
   const [Searchpanel, setSearchpanel] = useState(false);
 
   useEffect(() => {
@@ -51,11 +47,7 @@ export default function AccessibilityCard({
       return;
     }
     const timout = 400;
-    let searchtimeout;
-    if (searchtimeout) {
-      clearTimeout(searchtimeout);
-    }
-    searchtimeout = setTimeout(() => {
+    const searchtimeout = setTimeout(() => {
       setSearchedUsers(
         UsersRef.current.filter((user) =>
           user.name.toLowerCase().includes(inputtext.toLowerCase())
@@ -67,6 +59,10 @@ export default function AccessibilityCard({
       clearTimeout(searchtimeout);
     };
   }, [inputtext]);
+
+  if (!session) {
+    return <div>Not authenticated</div>;
+  }
 
   return (
     <div className="flex h-12 relative  w-full items-center px-2">
@@ -214,7 +210,7 @@ export default function AccessibilityCard({
             )}
             {SearchedUsers.map((user) => (
               <motion.div key={user.id}>
-                <UserCard user={user} notifications={user.notificationsSent} />
+                <UserCard user={user} notifications={[]} />
               </motion.div>
             ))}
           </motion.div>

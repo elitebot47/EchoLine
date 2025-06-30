@@ -46,7 +46,7 @@ export default function SignInPage() {
 
       toast.success("Login successful ✅");
       router.replace(callbackUrl);
-    } catch (error) {
+    } catch {
       toast.error("An unexpected error occurred");
       setLoader(false);
     }

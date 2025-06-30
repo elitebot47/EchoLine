@@ -12,8 +12,8 @@ export default function UserCard({
   user,
   notifications,
 }: {
-  user: any;
-  notifications: any;
+  user: { id: string; name: string; image?: string | null };
+  notifications: object[];
 }) {
   const path = usePathname();
   const setShowChat = useShowChatStore((state) => state.setShowChat);
@@ -22,11 +22,11 @@ export default function UserCard({
 
   const [newMessageCount, setNewMessageCount] = useState(notifications?.length);
   useEffect(() => {
-    const handleNotification = (data: any) => {
+    const handleNotification = (data: { fromUser: { id: string } }) => {
       if (data.fromUser.id !== user.id) return;
 
       if (data.fromUser.id === user.id && path !== `/c/${user.id}`) {
-        setNewMessageCount((prev: any) => prev + 1);
+        setNewMessageCount((prev: number) => prev + 1);
       }
     };
     socket?.on("notification", handleNotification);

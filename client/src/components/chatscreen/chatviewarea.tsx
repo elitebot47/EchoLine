@@ -9,6 +9,7 @@ import { useEffect, useRef } from "react";
 import { animateScroll as scroll } from "react-scroll";
 import { useMessages, useMessageMutations } from "@/lib/hooks/useMessages";
 import { dedupeMessages } from "@/lib/utils/messageUtils";
+import { minimalToMessageType } from "@/lib/utils/messageAdapter";
 import Message from "./message";
 
 export default function ChatViewArea({ roomId }: { roomId: string }) {
@@ -167,7 +168,7 @@ export default function ChatViewArea({ roomId }: { roomId: string }) {
                 .map((message) => (
                   <motion.div key={message.clientId || message.id}>
                     <Message
-                      MessageData={message}
+                      MessageData={minimalToMessageType(message)}
                       MyId={session?.user?.id || ""}
                     />
                   </motion.div>
