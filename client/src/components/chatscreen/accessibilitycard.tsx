@@ -17,7 +17,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowLeft, MenuIcon } from "lucide-react";
+import { ArrowLeft, MenuIcon, Search } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
@@ -71,7 +71,7 @@ export default function AccessibilityCard({
 
   return (
     <div
-      className={`flex h-12 relative ${
+      className={`flex h-16 relative ${
         Searchpanel ? "bg-white" : ""
       }  w-full items-center px-2`}
     >
@@ -91,7 +91,7 @@ export default function AccessibilityCard({
               >
                 <MenuIcon className="hover:scale-110 duration-500" size={35} />
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="border-2  border-white/20 bg-white/30 backdrop-blur-lg shadow-2xl ">
+              <DropdownMenuContent className="border-1   border-white/20 bg-white/30 backdrop-blur-xl shadow-lg ">
                 <DropdownMenuLabel className="font-bold ">
                   <div
                     className=" gap-1.5 flex
@@ -188,14 +188,14 @@ export default function AccessibilityCard({
           </motion.div>
         )}
       </AnimatePresence>
-      <motion.div transition={{ duration: 0.5 }} className={`w-full  px-3 `}>
+      <motion.div transition={{ duration: 0.5 }} className={`w-full  px-1 `}>
         <Input
           onChange={(e) => setInputtext(e.target.value)}
           onClick={() => {
             setSearchpanel(true);
           }}
           value={inputtext}
-          className=" rounded-full  font-medium w-full"
+          className=" rounded-full !text-2xl h-11  w-full"
           type="search"
         />
       </motion.div>
@@ -205,16 +205,19 @@ export default function AccessibilityCard({
             initial={{ opacity: 0.5 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="overflow-y-auto h-[94vh] scrollbar-thin origin-left absolute left-0 top-full  w-full  bg-white shadow-lg border z-10"
+            className="overflow-y-auto h-[94vh] scrollbar-thin origin-left absolute left-0 top-full  w-full  bg-white shadow-lg border-black/50 border-t-1 z-10"
           >
             {SearchedUsers.length === 0 && (
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.5 }}
-                className="text-center  "
+                className="text-center text-2xl mt-4 "
               >
-                {!inputtext ? "Search people here😊" : "No users found"}
+                {!inputtext ? "Search people here" : "No users found"}
+                <div className="lg:mt-48 opacity-50 flex justify-center">
+                  <Search className="size-20" />
+                </div>
               </motion.div>
             )}
             {SearchedUsers.map((user) => (

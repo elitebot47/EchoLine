@@ -135,7 +135,7 @@ export default function MessageInputCard({
   }
 
   return (
-    <div className="flex w-full bg-white shadow-lg border-2 border-l-0  shadow-black gap-2 justify-center items-center relative p-2 h-full">
+    <div className="flex w-full bg-white shadow-lg border-1 border-l-0  border-black/50 shadow-black gap-2 justify-center items-center relative p-2 h-full">
       <TextInputField
         uploading={uploading}
         chattext={chattext}
@@ -294,9 +294,10 @@ function TextInputField({
 }) {
   return (
     <Input
+      placeholder="Type a message"
       disabled={uploadbox || uploading}
-      className=" rounded-full shadow-none   lg:rounded-none  h-full w-full lg:!text-xl !text-2xl
-         focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus:border-0 focus:outline-none hover:ring-0 ring-0 border-0 bg-transparent  text-black"
+      className=" rounded-full !shadow-none !bg-transparent  lg:rounded-none  h-full w-full lg:!text-2xl !text-2xl
+         focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus:border-0 focus:outline-none hover:ring-0 ring-0 border-0  text-black"
       value={chattext}
       onChange={(e) => {
         setchattext(e.target.value);

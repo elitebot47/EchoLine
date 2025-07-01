@@ -37,7 +37,7 @@ export default function UserCard({
 
   return (
     <motion.div
-      className={`w-full hover:bg-black/60 duration-500 ${
+      className={`w-full hover:bg-black/40 duration-500 ${
         path === `/c/${user.id}` ? "!bg-black text-white " : ""
       }`}
     >
@@ -49,7 +49,7 @@ export default function UserCard({
         }}
         href={`/c/${user.id}`}
       >
-        <div className="w-full items-center gap-2 pr-7  h-20  flex px-4">
+        <div className="w-full items-center gap-5 pr-7  h-20  flex px-4">
           {user.image && (
             <CustomAvatar
               className={`rounded-full`}
@@ -59,11 +59,11 @@ export default function UserCard({
               src={`${user?.image}`}
             />
           )}
-          <div className={`text-3xl font-semibold`}>{user.name}</div>
+          <div className={`text-3xl     font-sans`}>{user.name}</div>
           {newMessageCount > 0 && (
             <div className="ml-auto">
               <Badge
-                className={`rounded-full h-12 w-12 text-2xl text-center`}
+                className={`rounded-full h-10 w-10 text-2xl text-center`}
                 variant="default"
               >
                 {newMessageCount}

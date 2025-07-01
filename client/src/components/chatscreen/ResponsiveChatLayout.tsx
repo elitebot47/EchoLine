@@ -63,12 +63,17 @@ export default function ResponsiveChatLayout({
         )}
         <section
           key={"side-bar"}
-          className={`overflow-y-auto relative  scrollbar-none  border-r-2
+          className={`overflow-y-auto relative  scrollbar-none  border-r-1 border-black/50
             ${showChat ? "hidden" : "block"} 
-          lg:block w-full lg:w-1/3 h-full  
+          lg:block w-full lg:w-[30%] h-full  
           `}
         >
-          <div className={`sticky top-0 z-40 bg-white/60 backdrop-blur-sm`}>
+          <div
+            className={`sticky  border-b-1 border-black/50 top-0 z-40 bg-white/60 backdrop-blur-md`}
+          >
+            <div className=" ml-3">
+              <h1 className="font-mono text-4xl font-semibold py-3">Wavybox</h1>
+            </div>
             <AccessibilityCard users={users} />
           </div>
           <div>
@@ -79,7 +84,7 @@ export default function ResponsiveChatLayout({
           key={"chat-view-screen"}
           className={`
           ${showChat ? "block" : "hidden"} 
-          lg:block overflow-hidden w-full lg:w-2/3 h-full
+          lg:block overflow-hidden w-full lg:w-[70%] h-full
           `}
         >
           {children}
