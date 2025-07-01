@@ -34,7 +34,7 @@ export default function ResponsiveChatLayout({
   }, [isMobile, setIsMobile]);
 
   return (
-    <main className="flex flex-col lg:flex-row h-screen relative ">
+    <main className="flex flex-col lg:flex-row overflow-hidden h-screen relative ">
       <AnimatePresence>
         {isMobile && mobileBannerStatus && (
           <motion.div
@@ -63,13 +63,17 @@ export default function ResponsiveChatLayout({
         )}
         <section
           key={"side-bar"}
-          className={` border-r-2
+          className={`overflow-y-auto relative  scrollbar-none  border-r-2
             ${showChat ? "hidden" : "block"} 
           lg:block w-full lg:w-1/3 h-full  
           `}
         >
-          <AccessibilityCard users={users} />
-          <UserList />
+          <div className={`sticky top-0 z-40 bg-white/60 backdrop-blur-sm`}>
+            <AccessibilityCard users={users} />
+          </div>
+          <div>
+            <UserList />
+          </div>
         </section>
         <section
           key={"chat-view-screen"}

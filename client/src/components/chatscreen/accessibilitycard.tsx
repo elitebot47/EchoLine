@@ -36,9 +36,14 @@ export default function AccessibilityCard({
   const { data: session } = useSession();
   const [inputtext, setInputtext] = useState("");
   const UsersRef = useRef(
-    users.filter((User: { id: string; name: string; image?: string | null }) => User.id != session?.user?.id)
+    users.filter(
+      (User: { id: string; name: string; image?: string | null }) =>
+        User.id != session?.user?.id
+    )
   );
-  const [SearchedUsers, setSearchedUsers] = useState<{ id: string; name: string; image?: string | null }[]>([]);
+  const [SearchedUsers, setSearchedUsers] = useState<
+    { id: string; name: string; image?: string | null }[]
+  >([]);
   const [Searchpanel, setSearchpanel] = useState(false);
 
   useEffect(() => {
@@ -65,7 +70,11 @@ export default function AccessibilityCard({
   }
 
   return (
-    <div className="flex h-12 relative  w-full items-center px-2">
+    <div
+      className={`flex h-12 relative ${
+        Searchpanel ? "bg-white" : ""
+      }  w-full items-center px-2`}
+    >
       <AnimatePresence mode="wait">
         {!Searchpanel ? (
           <motion.div
@@ -179,7 +188,7 @@ export default function AccessibilityCard({
           </motion.div>
         )}
       </AnimatePresence>
-      <motion.div transition={{ duration: 0.5 }} className={`w-full px-3 `}>
+      <motion.div transition={{ duration: 0.5 }} className={`w-full  px-3 `}>
         <Input
           onChange={(e) => setInputtext(e.target.value)}
           onClick={() => {
@@ -196,7 +205,7 @@ export default function AccessibilityCard({
             initial={{ opacity: 0.5 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="overflow-hidden h-[93vh] origin-left absolute left-0 top-full  w-full  bg-white shadow-lg border z-10"
+            className="overflow-y-auto h-[94vh] scrollbar-thin origin-left absolute left-0 top-full  w-full  bg-white shadow-lg border z-10"
           >
             {SearchedUsers.length === 0 && (
               <motion.div

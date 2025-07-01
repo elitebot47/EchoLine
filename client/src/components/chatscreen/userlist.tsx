@@ -10,7 +10,7 @@ import UserCard from "./usercard";
 export default function UserList() {
   const { data: session } = useSession();
   const socket = useSocketStore((state) => state.socket);
-  
+
   const {
     data: users = [],
     isLoading,
@@ -24,11 +24,11 @@ export default function UserList() {
         return res.data.users || [];
       } catch (error) {
         console.error("Failed to fetch users:", error);
-        throw error; 
+        throw error;
       }
     },
     enabled: !!session,
-    staleTime: 5 * 60 * 1000, 
+    staleTime: 5 * 60 * 1000,
     retry: 3,
   });
 
@@ -56,7 +56,7 @@ export default function UserList() {
         <div className="text-red-500 text-center mb-4">
           Unexpected error occurred!
         </div>
-        <button 
+        <button
           onClick={() => refetch()}
           className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
         >
@@ -67,7 +67,7 @@ export default function UserList() {
   }
 
   return (
-    <div className="w-full">
+    <div className="w-full ">
       {users?.map((user) => (
         <UserCard
           key={user.id}
