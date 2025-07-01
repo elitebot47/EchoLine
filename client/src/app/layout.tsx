@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Wavybox",
+  title: "EchoLine ",
   description: "Real-time messaging app",
 };
 

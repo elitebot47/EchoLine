@@ -72,7 +72,9 @@ export default function ResponsiveChatLayout({
             className={`sticky  border-b-1 border-black/50 top-0 z-40 bg-white/60 backdrop-blur-md`}
           >
             <div className=" ml-3">
-              <h1 className="font-mono text-4xl font-semibold py-3">Wavybox</h1>
+              <h1 className="font-mono text-4xl font-semibold py-3">
+                EchoLine{" "}
+              </h1>
             </div>
             <AccessibilityCard users={users} />
           </div>
