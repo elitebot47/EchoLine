@@ -33,6 +33,11 @@ This separation allows for independent scaling and deployment of each component.
 ## 🔄 Real-time Communication Flow
 
 ```mermaid
+sequenceDiagram
+    participant Client1 as User 1
+    participant NextJS as Next.js App
+    participant Socket as Socket.io Server
+    participant Client2 as User 2
 
     Client1->>NextJS: Send message
     NextJS->>NextJS: Store in PostgreSQL
@@ -42,6 +47,8 @@ This separation allows for independent scaling and deployment of each component.
     Client2->>Socket: Acknowledge receipt
     Socket->>Client1: Deliver receipt status
 ```
+
+````
 
 ## 🛡️ Authentication Flow
 
@@ -105,7 +112,7 @@ EchoLine uses NextAuth.js for secure authentication with:
 ```bash
 git clone https://github.com/elitebot47/EchoLine.git
 cd EchoLine
-```
+````
 
 #### 2. Set up the client
 
