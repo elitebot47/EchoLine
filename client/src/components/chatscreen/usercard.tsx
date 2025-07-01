@@ -37,8 +37,8 @@ export default function UserCard({
 
   return (
     <motion.div
-      className={`w-full  ${
-        path === `/c/${user.id}` ? "!bg-black text-white" : "bg-gray-500"
+      className={`w-full hover:bg-black/60 duration-500 ${
+        path === `/c/${user.id}` ? "!bg-black text-white " : ""
       }`}
     >
       <Link

@@ -15,7 +15,6 @@ export default function ChatScreenHeader({
   user: { id: string; name: string; image?: string | null };
   roomId: string;
 }) {
-  // const { data: session } = useSession();
   const Chat = useShowChatStore((state) => state.showChat);
   const setChat = useShowChatStore((state) => state.setShowChat);
   const socket = useSocketStore((state) => state.socket);

@@ -18,7 +18,7 @@ import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import Spinner from "../ui/spinner";
 
-type MinimalParticipant = { user: { id: string; name: string } };
+type MinimalParticipant = { user: { id: string } };
 
 type MessageInputCardProps = {
   id: string;
@@ -183,7 +183,7 @@ function UploadBox({
   RoomId,
 }: {
   setUploadbox: React.Dispatch<React.SetStateAction<boolean>>;
-  recipient: { user: { id: string; name: string; image?: string | null } };
+  recipient: { user: { id: string; name?: string; image?: string | null } };
   uploading: boolean;
   setUploading: React.Dispatch<React.SetStateAction<boolean>>;
   RoomId: string;

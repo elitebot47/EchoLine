@@ -14,12 +14,8 @@ export default async function ChatViewPage({
   if (!User?.id) {
     return <div>Not authorised, Login first</div>;
   }
-  console.log("c/page.tsx");
-
-  console.log("userid", userid);
 
   const myId = User.id;
-  console.log("myid", myId);
   if (userid === myId) {
     return <div>Chat Unavailable, you can&apos;t message yourself</div>;
   }
@@ -38,13 +34,7 @@ export default async function ChatViewPage({
         id: true,
         participants: {
           select: {
-            user: {
-              select: {
-                id: true,
-                name: true,
-                image: true,
-              },
-            },
+            user: { select: { id: true, name: true, image: true } },
           },
         },
       },
@@ -57,13 +47,8 @@ export default async function ChatViewPage({
         },
         select: {
           id: true,
-
           participants: {
             select: {
-              id: true,
-              userId: true,
-              roomId: true,
-              room: { select: { id: true } },
               user: { select: { id: true, name: true, image: true } },
             },
           },
@@ -71,11 +56,17 @@ export default async function ChatViewPage({
       });
     }
   } catch (error) {
-    return <div>{`Unexpected Error occurred: ${error}`.replace("'", "&apos;")}</div>;
+    return (
+      <div>{`Unexpected Error occurred: ${error}`.replace("'", "&apos;")}</div>
+    );
   }
 
   if (!room) {
-    return <div>{"Room not found or could not be created.".replace("'", "&apos;")}</div>;
+    return (
+      <div>
+        {"Room not found or could not be created.".replace("'", "&apos;")}
+      </div>
+    );
   }
   const thisUser = room.participants.find(
     (user) => user.user.id !== User.id
