@@ -28,7 +28,7 @@ export default function Spinner({
         className={cn(
           " animate-spin text-muted-foreground",
           sizeClasses[size],
-          className
+          className,
         )}
         {...props}
       />

@@ -37,7 +37,7 @@ export default function MessageInputCard({
   const [chattext, setchattext] = useState("");
   const [uploadbox, setUploadbox] = useState(false);
   const recipient = participants.find(
-    (user) => user.user.id !== session?.user?.id
+    (user) => user.user.id !== session?.user?.id,
   );
 
   const mutation = useMutation({
@@ -55,7 +55,7 @@ export default function MessageInputCard({
           ...newMessage,
           createdAt: new Date().toISOString(),
         },
-        session?.user.id || ""
+        session?.user.id || "",
       );
 
       queryClient.setQueryData(["messages", id], (old = []) => [
@@ -81,8 +81,8 @@ export default function MessageInputCard({
         (old as MinimalMessage[]).map((msg) =>
           msg.id === context?.tempId
             ? { ...message, clientId: msg.clientId, optimistic: false }
-            : msg
-        )
+            : msg,
+        ),
       );
 
       socket?.emit("Chat_client", message);

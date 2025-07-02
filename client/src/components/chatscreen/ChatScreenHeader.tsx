@@ -71,7 +71,7 @@ export default function ChatScreenHeader({
               key={"user-name"}
               className={clsx(
                 "duration-300 text-3xl  ",
-                " text-center flex justify-center items-center "
+                " text-center flex justify-center items-center ",
               )}
             >
               {user.name}

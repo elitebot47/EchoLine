@@ -21,13 +21,13 @@ export async function POST(req: NextRequest) {
     if (!file || typeof uploadPreset !== "string") {
       return NextResponse.json(
         { error: "Missing file or upload preset" },
-        { status: 400 }
+        { status: 400 },
       );
     }
     if (file.size > 1024 * 1024 * 4) {
       return NextResponse.json(
         { error: "File bigger than 4mb is not allowed" },
-        { status: 400 }
+        { status: 400 },
       );
     }
     cloudinaryFormdata.append("file", file, file.name);
@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
 
     const res = await axios.post(
       `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
-      cloudinaryFormdata
+      cloudinaryFormdata,
     );
 
     const cloudinaryResponse = await res.data;
@@ -77,7 +77,7 @@ export async function DELETE(req: NextRequest) {
     });
     return NextResponse.json(
       { message: "successfully removed profile picture" },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error: unknown) {
     let message = "Unknown error";

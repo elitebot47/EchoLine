@@ -69,7 +69,7 @@ export default async function ChatViewPage({
     );
   }
   const thisUser = room.participants.find(
-    (user) => user.user.id !== User.id
+    (user) => user.user.id !== User.id,
   )?.user;
   if (!thisUser) {
     return <div>Error while fecthing user&apos;s Profile</div>;

@@ -79,11 +79,11 @@ export default function SettingPage() {
                     data: { Id: session.user?.id },
                   });
                   toast.success(
-                    "Profile picture removed sucessfully,Changes may take time."
+                    "Profile picture removed sucessfully,Changes may take time.",
                   );
                 } catch {
                   toast.error(
-                    "Error: Unable to remove profile picture,try again later"
+                    "Error: Unable to remove profile picture,try again later",
                   );
                 } finally {
                   avatarActionLoader.current = false;
@@ -125,7 +125,7 @@ export default function SettingPage() {
                   <DialogDescription className="text-white">
                     {Imagepreviewdata &&
                       `File size: ${(Imagepreviewdata.size / 1024).toFixed(
-                        2
+                        2,
                       )} KB`}
                   </DialogDescription>
                 </DialogHeader>
@@ -168,7 +168,7 @@ export default function SettingPage() {
                         if (!upload_preset) {
                           setImagepreviewdata(null);
                           toast.error(
-                            "Error: Cloudinary upload preset is missing!"
+                            "Error: Cloudinary upload preset is missing!",
                           );
                           return;
                         }
@@ -181,12 +181,12 @@ export default function SettingPage() {
                         formData.append("upload_preset", upload_preset);
                         await axios.post(`/api/user/avatar`, formData);
                         toast.success(
-                          "Profile picture changed succesfully,changes may take hours to to be visible"
+                          "Profile picture changed succesfully,changes may take hours to to be visible",
                         );
                         setImagepreviewdata(null);
                       } catch {
                         toast.error(
-                          "error while Updating profile!,try again later"
+                          "error while Updating profile!,try again later",
                         );
                         setImagepreviewdata(null);
                       } finally {

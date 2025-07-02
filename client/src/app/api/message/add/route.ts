@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
   if (!result.success) {
     return NextResponse.json(
       { message: result.error.flatten().fieldErrors },
-      { status: 400 }
+      { status: 400 },
     );
   }
   try {

@@ -38,7 +38,7 @@ export default function ChatViewArea({ roomId }: { roomId: string }) {
         console.error("Failed to mark notifications as seen:", error);
       }
     };
-    
+
     if (roomId && session?.user?.id) {
       markNotificationSeen();
     }
@@ -46,7 +46,7 @@ export default function ChatViewArea({ roomId }: { roomId: string }) {
 
   useEffect(() => {
     if (!socket || !roomId) return;
-    
+
     socket.emit("joinRoom", `${roomId}`);
     return () => {
       socket.emit("leaveRoom", `${roomId}`);
@@ -55,36 +55,44 @@ export default function ChatViewArea({ roomId }: { roomId: string }) {
 
   useEffect(() => {
     if (!socket) return;
-    
+
     const handler = (data: MinimalMessage) => {
       try {
         queryClient.setQueryData(["messages", roomId], (old = []) => {
           const oldMessages = old as MinimalMessage[];
-          
+
           const optimisticIndex = oldMessages.findIndex(
             (msg) =>
               msg.optimistic &&
               msg.content === data.content &&
               msg.fromId === data.fromId &&
               Math.abs(
-                new Date(msg.createdAt).getTime() - new Date(data.createdAt).getTime()
-              ) < 2000
+                new Date(msg.createdAt).getTime() -
+                  new Date(data.createdAt).getTime(),
+              ) < 2000,
           );
-          
+
           if (optimisticIndex !== -1) {
             const clientId = oldMessages[optimisticIndex].clientId;
             const newMessages = [...oldMessages];
-            newMessages[optimisticIndex] = { ...data, clientId, optimistic: false };
+            newMessages[optimisticIndex] = {
+              ...data,
+              clientId,
+              optimistic: false,
+            };
             return newMessages;
           } else {
-            return [...oldMessages, { ...data, clientId: data.clientId || data.id }];
+            return [
+              ...oldMessages,
+              { ...data, clientId: data.clientId || data.id },
+            ];
           }
         });
       } catch (error) {
         console.error("Error updating messages from socket:", error);
       }
     };
-    
+
     socket.on("BroadToMembers", handler);
     return () => {
       socket.off("BroadToMembers", handler);
@@ -93,7 +101,7 @@ export default function ChatViewArea({ roomId }: { roomId: string }) {
 
   useEffect(() => {
     if (!socket) return;
-    
+
     const handler = (data: { id: string; roomId: string }) => {
       try {
         if (data.id) {
@@ -103,7 +111,7 @@ export default function ChatViewArea({ roomId }: { roomId: string }) {
         console.error("Error handling message deletion:", error);
       }
     };
-    
+
     socket.on("delete-message-action", handler);
     return () => {
       socket.off("delete-message-action", handler);
@@ -129,8 +137,10 @@ export default function ChatViewArea({ roomId }: { roomId: string }) {
       <div className="flex justify-center items-center h-full">
         <div className="text-red-500 text-center">
           <p>Failed to load messages</p>
-          <button 
-            onClick={() => queryClient.invalidateQueries({ queryKey: ["messages", roomId] })}
+          <button
+            onClick={() =>
+              queryClient.invalidateQueries({ queryKey: ["messages", roomId] })
+            }
             className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
           >
             Retry

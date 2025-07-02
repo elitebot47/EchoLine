@@ -16,13 +16,13 @@ export async function POST(req: NextRequest) {
     if (!file || typeof uploadPreset !== "string") {
       return NextResponse.json(
         { error: "Missing file or upload preset" },
-        { status: 400 }
+        { status: 400 },
       );
     }
     if (file.size > 1024 * 1024 * 5) {
       return NextResponse.json(
         { error: "File bigger than 5mb is not allowed" },
-        { status: 400 }
+        { status: 400 },
       );
     }
     let filetype: Filetype;
@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
     cloudinaryFormdata.append("upload_preset", uploadPreset);
     const res = await axios.post(
       `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/${cloudinaryUploadType[filetype]}/upload`,
-      cloudinaryFormdata
+      cloudinaryFormdata,
     );
     console.log("res.data from document route: ", res.data);
 

@@ -121,8 +121,8 @@ const MyDropzone = ({
         if (filetype === "image") {
           queryClient.setQueryData(["messages", roomId], (old = []) =>
             (old as MinimalMessage[]).map((msg) =>
-              msg.id === file.id ? res2.data.message : msg
-            )
+              msg.id === file.id ? res2.data.message : msg,
+            ),
           );
         }
 
@@ -169,7 +169,7 @@ const MyDropzone = ({
             .toString(36)
             .substring(2)}`,
           preview: URL.createObjectURL(file),
-        })
+        }),
       );
       setUploadedFiles((prevFiles) => [...prevFiles, ...newFilesWithPreview]);
 
@@ -178,7 +178,7 @@ const MyDropzone = ({
       }
     },
 
-    [uploadedFiles]
+    [uploadedFiles],
   );
 
   useEffect(() => {
@@ -219,8 +219,8 @@ const MyDropzone = ({
   const dropzoneBorderColor = isDragAccept
     ? "border-green-500"
     : isDragReject
-    ? "border-red-500"
-    : "border-gray-300";
+      ? "border-red-500"
+      : "border-gray-300";
 
   return (
     <AnimatePresence mode="wait">
@@ -237,10 +237,10 @@ const MyDropzone = ({
             {...getRootProps({})}
             className={`flex flex-col items-center p-10  rounded-2xl border-dashed bg-gray-50/50 text-gray-800   outline-none transition-colors duration-200 cursor-pointer 
               ${dropzoneBorderColor} ${
-              isDragActive
-                ? "bg-gray-900/30 border-2 w-[800px]   border-dashed  "
-                : ""
-            }`}
+                isDragActive
+                  ? "bg-gray-900/30 border-2 w-[800px]   border-dashed  "
+                  : ""
+              }`}
           >
             <input {...getInputProps()} />
             {isDragActive ? (
@@ -302,7 +302,7 @@ const MyDropzone = ({
                           e.stopPropagation();
                           const previewUrl = file.preview;
                           setUploadedFiles((prev) =>
-                            prev.filter((f) => f.id !== file.id)
+                            prev.filter((f) => f.id !== file.id),
                           );
                           requestAnimationFrame(() => {
                             const images = Array.from(document.images);

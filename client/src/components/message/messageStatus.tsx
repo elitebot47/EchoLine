@@ -15,7 +15,7 @@ export function MessageStatus({
       className={cn(
         "ml-1.5 inline-flex items-center",
         status === "READ" ? "text-blue-500" : "text-muted-foreground",
-        className
+        className,
       )}
     >
       {status === "SENDING" && <Clock className="w-3 h-3 animate-pulse" />}

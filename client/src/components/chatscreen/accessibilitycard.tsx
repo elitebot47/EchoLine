@@ -38,8 +38,8 @@ export default function AccessibilityCard({
   const UsersRef = useRef(
     users.filter(
       (User: { id: string; name: string; image?: string | null }) =>
-        User.id != session?.user?.id
-    )
+        User.id != session?.user?.id,
+    ),
   );
   const [SearchedUsers, setSearchedUsers] = useState<
     { id: string; name: string; image?: string | null }[]
@@ -55,8 +55,8 @@ export default function AccessibilityCard({
     const searchtimeout = setTimeout(() => {
       setSearchedUsers(
         UsersRef.current.filter((user) =>
-          user.name.toLowerCase().includes(inputtext.toLowerCase())
-        )
+          user.name.toLowerCase().includes(inputtext.toLowerCase()),
+        ),
       );
     }, timout);
 

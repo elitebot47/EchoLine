@@ -11,12 +11,12 @@ export async function PUT(req: NextRequest) {
     if (!User?.id) {
       return NextResponse.json(
         { message: "Unauthorized - Please login" },
-        { status: 401 }
+        { status: 401 },
       );
     }
     const data = await prisma.notification.updateMany({
       where: { roomId, recipientId, seen: false },
-    data: { seen: true },
+      data: { seen: true },
     });
     console.log("notifications from newmessage route-", data);
 
@@ -25,7 +25,7 @@ export async function PUT(req: NextRequest) {
     console.error("Failed to fetch users:", error);
     return NextResponse.json(
       { message: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -74,7 +74,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           }
 
           const passwordCorrect = await VerifyPassword(user.password, password);
-          
+
           if (!passwordCorrect) {
             return null;
           }
@@ -92,7 +92,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       },
     }),
   ],
-  session: { 
+  session: {
     strategy: "jwt",
     maxAge: 30 * 24 * 60 * 60,
   },
@@ -104,7 +104,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.name = user.name;
         token.image = user.image;
       }
-      
+
       if (account?.provider === "google" && user?.email && user.name) {
         try {
           let dbUser = await prisma.user.findUnique({

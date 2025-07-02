@@ -2,7 +2,7 @@ import type { MinimalMessage, MessageType, RoomType } from "@/types";
 
 export function minimalToMessageType(
   msg: MinimalMessage,
-  room?: RoomType
+  room?: RoomType,
 ): MessageType {
   return {
     ...msg,
@@ -14,4 +14,4 @@ export function minimalToMessageType(
     createdAt: new Date(msg.createdAt),
     updatedAt: new Date(msg.updatedAt),
   };
-} 
+}

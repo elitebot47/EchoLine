@@ -12,7 +12,7 @@ export async function DELETE(req: NextRequest) {
   if (!session?.user?.id) {
     return NextResponse.json(
       { success: false, message: "Not authenticated" },
-      { status: 401 }
+      { status: 401 },
     );
   }
 
@@ -27,7 +27,7 @@ export async function DELETE(req: NextRequest) {
         message: "Message deleted successfully",
         messageId: deletedMessage.id,
       },
-      { status: 200 }
+      { status: 200 },
     );
     console.log("dleted content:", deletedMessage.content);
 
@@ -56,7 +56,7 @@ export async function DELETE(req: NextRequest) {
     if (error instanceof PrismaClientKnownRequestError) {
       if (error.code === "P2025") {
         console.warn(
-          `Attempted to delete message ID ${id} by user ${session.user.id}, but it was not found or not owned by user.`
+          `Attempted to delete message ID ${id} by user ${session.user.id}, but it was not found or not owned by user.`,
         );
         return new Response(
           JSON.stringify({
@@ -64,7 +64,7 @@ export async function DELETE(req: NextRequest) {
               "Message not found or you don't have permission to delete it.",
             success: false,
           }),
-          { status: 404 }
+          { status: 404 },
         );
       }
     }
@@ -73,7 +73,7 @@ export async function DELETE(req: NextRequest) {
         success: false,
         message: "Failed to delete message",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

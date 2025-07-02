@@ -9,7 +9,7 @@ export async function GET() {
     if (!User?.id) {
       return NextResponse.json(
         { message: "Unauthorized - Please login" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -44,7 +44,7 @@ export async function GET() {
       "notifications data is know users route-",
       participants.map((p) => ({
         notifications: p.user.notificationsSent,
-      }))
+      })),
     );
 
     const users = participants.map((p) => ({
@@ -60,7 +60,7 @@ export async function GET() {
     console.error("Failed to fetch users:", error);
     return NextResponse.json(
       { message: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

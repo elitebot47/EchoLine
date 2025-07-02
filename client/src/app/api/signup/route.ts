@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
       {
         message: `${zodCheck.error}`,
       },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
     if (existingUser)
       return NextResponse.json(
         { message: "User already exists!,try logging in." },
-        { status: 409 }
+        { status: 409 },
       );
     const hashedPassword = await HashPassword(password);
     await prisma.user.create({
@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
             error: "AccountConflict",
             message: "User already exists!,try logging in.",
           },
-          { status: 409 }
+          { status: 409 },
         );
       }
     }
@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
         message: "Registration failed. Please try again later.",
         error: "InternalError",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

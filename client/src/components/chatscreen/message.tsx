@@ -114,7 +114,7 @@ function MessageFooter({ time }: { time: Date }) {
         hour: "2-digit",
         minute: "2-digit",
         hour12: true,
-      })
+      }),
     );
   }, [time]);
 
@@ -366,8 +366,8 @@ function MessageOptions({
                 ["messages", MessageData.roomId],
                 (old = []) =>
                   (old as MinimalMessage[]).filter(
-                    (msg) => msg.id != MessageData.id
-                  )
+                    (msg) => msg.id != MessageData.id,
+                  ),
               );
               setDeleting(false);
               socket?.emit("delete-message", {
