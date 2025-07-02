@@ -7,11 +7,11 @@ import { UserCreateSchema } from "@/lib/schemas/user";
 import axios from "axios";
 import { Check } from "lucide-react";
 import { signIn } from "next-auth/react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
-import Image from "next/image";
 
 export default function SignUpPage() {
   const [email, setEmail] = useState("");
@@ -58,24 +58,32 @@ export default function SignUpPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
       <div className="w-full max-w-4xl bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col md:flex-row">
-        <div className="md:w-1/2 bg-gradient-to-br from-blue-600 to-indigo-800 p-8 flex flex-col justify-center items-center text-white">
-          <h2 className="text-3xl font-bold mb-4">Join Our Community</h2>
-          <p className="text-blue-100 mb-8 text-lg">
-            Sign up to access exclusive features and connect with thousands of
-            users.
-          </p>
-          <ul className="space-y-3 text-lg">
+        <div className="md:w-1/2 bg-gradient-to-br from-blue-600 to-indigo-800 p-8  flex flex-col   text-white">
+          <h1 className="font-mono text-6xl  mt-10 mb-8">EchoLine</h1>
+
+          <ul className="space-y-3  text-lg">
             <li className="flex items-center gap-2">
-              <Check className="w-5 h-5" />
-              Easy to use interface
+              <Check className="w-5 h-5" /> Real-time messaging app
             </li>
             <li className="flex items-center gap-2">
               <Check className="w-5 h-5" />
-              Secure and private
+              File uploads and sharing via Cloudinary{" "}
+            </li>
+            <li className="flex items-center  gap-2">
+              <Check className="w-5 h-5" />
+              User presence indicators and typing status{" "}
             </li>
             <li className="flex items-center gap-2">
               <Check className="w-5 h-5" />
-              24/7 customer support
+              user search and message history
+            </li>
+            <li className="flex items-center gap-2">
+              <Check className="w-5 h-5" />
+              In-app notifications system{" "}
+            </li>
+            <li className="flex items-center gap-2">
+              <Check className="w-5 h-5" />
+              Modern and sleek UI{" "}
             </li>
           </ul>
         </div>
