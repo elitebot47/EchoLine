@@ -26,8 +26,8 @@ import clsx from "clsx";
 import { AnimatePresence, easeIn, motion } from "framer-motion";
 import { Ellipsis, FileDown, X } from "lucide-react";
 import { CldImage } from "next-cloudinary";
-import { useEffect, useState } from "react";
 import Image from "next/image";
+import { useEffect, useState } from "react";
 import type { Socket } from "socket.io-client";
 import { toast } from "sonner";
 import { MessageStatus } from "../message/messageStatus";
@@ -99,26 +99,20 @@ export default function Message({
         </div>
       </div>
 
-      <MessageFooter />
+      <MessageFooter time={MessageData.createdAt} />
     </motion.div>
   );
 }
 
 // ---------------------------------------------------------------------
-function MessageFooter() {
-  const time = new Date().toLocaleTimeString([], {
+function MessageFooter({ time }: { time: Date }) {
+  const createdAt = time.toLocaleTimeString([], {
     hour: "2-digit",
     minute: "2-digit",
+    hour12: true,
   });
-  // const statusUpdatehandler = (data) => {
+  console.log("time in message:", time);
 
-  // };
-  // useEffect(() => {
-  //   socket.on(`message-status`, statusUpdatehandler);
-  //   return () => {
-  //     socket.off(`message-status`, statusUpdatehandler);
-  //   };
-  // }, [socket]);
   return (
     <div className=" self-end flex h-2 mt-1  items-center">
       <div
@@ -126,7 +120,7 @@ function MessageFooter() {
              "self-end" 
             font-light text-xs text-[10px]`}
       >
-        {time}
+        {createdAt}
       </div>
       <div>
         <MessageStatus status={`DELIVERED`}></MessageStatus>
@@ -182,7 +176,7 @@ function LinkContent({ MessageData }: { MessageData: MessageType }) {
         <HoverCardTrigger asChild>
           {MessageData.contentType === "link" && (
             <a
-              className="text-green-700  hover:underline underline-offset-5 break-all"
+              className="text-yellow-300  underline underline-offset-5 break-all"
               href={MessageData.content}
               target="_blank"
               rel="noopener noreferrer"
@@ -192,7 +186,7 @@ function LinkContent({ MessageData }: { MessageData: MessageType }) {
           )}
         </HoverCardTrigger>
         <HoverCardContent
-          className={` text-sm m-1 text-nowrap p-2 bg-black/70 backdrop-blur-lg rounded-lg w-fit text-red-500`}
+          className={` text-sm m-1 text-nowrap p-2 bg-white/70 backdrop-blur-lg rounded-lg w-fit text-red-500`}
         >
           <span className="text-sm font-medium"> Caution: </span>
           <span className="text-sm">Link can be malicious</span>

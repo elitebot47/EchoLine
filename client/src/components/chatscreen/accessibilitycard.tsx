@@ -71,13 +71,14 @@ export default function AccessibilityCard({
 
   return (
     <div
-      className={`flex h-16 relative ${
-        Searchpanel ? "bg-white" : ""
+      className={`flex  h-16 relative ${
+        Searchpanel ? "bg-transparent" : ""
       }  w-full items-center px-2`}
     >
       <AnimatePresence mode="wait">
         {!Searchpanel ? (
           <motion.div
+            className="w-10 h-10"
             key={"menubutton"}
             initial={{ rotate: -45, opacity: 0 }}
             animate={{ rotate: 0, opacity: 1 }}
@@ -89,9 +90,9 @@ export default function AccessibilityCard({
                 asChild
                 className=" cursor-pointer [&[data-state=open]]:bg-transparent focus:ring-0 focus:ring-offset-0 ring-0 flex justify-center items-center "
               >
-                <MenuIcon className="hover:scale-110 duration-500" size={35} />
+                <MenuIcon className="hover:scale-110 duration-500" size={40} />
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="border-1   border-white/20 bg-white/30 backdrop-blur-xl shadow-lg ">
+              <DropdownMenuContent className="border-1 border-gray-100   bg-white/70 backdrop-blur-lg  shadow-2xl shadow-black/50 ">
                 <DropdownMenuLabel className="font-bold ">
                   <div
                     className=" gap-1.5 flex
@@ -170,6 +171,7 @@ export default function AccessibilityCard({
           </motion.div>
         ) : (
           <motion.div
+            className="w-10 h-10"
             key={"closebutton"}
             initial={{ rotate: 45, opacity: 0 }}
             animate={{ rotate: 0, opacity: 1 }}
@@ -188,14 +190,18 @@ export default function AccessibilityCard({
           </motion.div>
         )}
       </AnimatePresence>
-      <motion.div transition={{ duration: 0.5 }} className={`w-full  px-1 `}>
+      <motion.div
+        transition={{ duration: 0.5 }}
+        className={`w-full  mx-auto px-0.5`}
+      >
         <Input
           onChange={(e) => setInputtext(e.target.value)}
           onClick={() => {
             setSearchpanel(true);
           }}
           value={inputtext}
-          className=" rounded-full !text-2xl h-11  w-full"
+          placeholder="Search people"
+          className=" rounded-full border-1 border-black/30 focus:border-3 focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus:border-black focus:outline-none hover:ring-0 ring-0  !text-2xl h-11  w-full"
           type="search"
         />
       </motion.div>

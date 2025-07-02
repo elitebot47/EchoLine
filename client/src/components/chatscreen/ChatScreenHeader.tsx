@@ -40,7 +40,7 @@ export default function ChatScreenHeader({
     };
   }, [socket, roomId, user]);
   return (
-    <div className="text-2xl px-4 h-full bg-black/20  items-center flex w-full ">
+    <div className="text-2xl px-4 h-full bg-black/50  items-center flex w-full ">
       <div className="mr-4 block lg:hidden ">
         {Chat && (
           <Button
