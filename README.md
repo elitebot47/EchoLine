@@ -2,7 +2,8 @@
 
 A full-stack real-time messaging platform with WebSocket communication, file uploads, and a sleek UI.
 
-![EchoLine](https://github.com/elitebot47/EchoLine/raw/main/client/public/preview.png)
+![](assets/3.png)
+![](assets/4.png)
 
 ## Live Demo
 
