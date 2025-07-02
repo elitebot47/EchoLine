@@ -48,8 +48,6 @@ sequenceDiagram
     Socket->>Client1: Deliver receipt status
 ```
 
-````
-
 ## 🛡️ Authentication Flow
 
 EchoLine uses NextAuth.js for secure authentication with:
@@ -112,7 +110,7 @@ EchoLine uses NextAuth.js for secure authentication with:
 ```bash
 git clone https://github.com/elitebot47/EchoLine.git
 cd EchoLine
-````
+```
 
 #### 2. Set up the client
 
