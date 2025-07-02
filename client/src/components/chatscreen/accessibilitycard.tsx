@@ -220,9 +220,10 @@ export default function AccessibilityCard({
                 transition={{ duration: 0.5 }}
                 className="text-center text-2xl mt-4 "
               >
-                {!inputtext ? "Search people here" : "No users found"}
-                <div className="lg:mt-48 opacity-50 flex justify-center">
-                  <Search className="size-20" />
+                <div className="lg:mt-48 opacity-50 flex flex-col items-center justify-center">
+                  {!inputtext ? "Search people here" : "No users found"}
+
+                  <Search className=" size-20" />
                 </div>
               </motion.div>
             )}
