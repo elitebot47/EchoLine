@@ -106,12 +106,17 @@ export default function Message({
 
 // ---------------------------------------------------------------------
 function MessageFooter({ time }: { time: Date }) {
-  const createdAt = time.toLocaleTimeString([], {
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: true,
-  });
-  console.log("time in message:", time);
+  const [createdAt, setCreatedAt] = useState("");
+
+  useEffect(() => {
+    setCreatedAt(
+      time.toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true,
+      })
+    );
+  }, [time]);
 
   return (
     <div className=" self-end flex h-2 mt-1  items-center">
