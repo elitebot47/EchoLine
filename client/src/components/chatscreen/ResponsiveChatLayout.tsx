@@ -63,7 +63,7 @@ export default function ResponsiveChatLayout({
         )}
         <section
           key={"side-bar"}
-          className={`overflow-y-auto relative  scrollbar-none  border-r-1 border-black/50
+          className={`overflow-y-auto relative  scrollbar-none scroll-smooth border-r-1 border-black/50
             ${showChat ? "hidden" : "block"} 
           lg:block w-full lg:w-[30%] h-full  
           `}

@@ -87,7 +87,7 @@ export default function ChatScreenHeader({
                   repeatType: "reverse",
                   ease: "easeInOut",
                 }}
-                className="flex justify-start items-center text-sm mb-2 mt-0 pt-0 font-semibold text-black"
+                className="flex justify-start items-center text-sm mb-2 mt-0 pt-0 font-semibold text-green-500"
               >
                 Typing...
               </motion.div>
